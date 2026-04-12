@@ -1,0 +1,25 @@
+name: podscars
+region: nyc
+services:
+  - name: web
+    environment_slug: node-js
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-0.5gb
+    http_port: 3000
+    build_command: npm install --legacy-peer-deps && npm run build
+    run_command: npm start
+    github:
+      repo: mildsdixon/podscars
+      branch: main
+      deploy_on_push: true
+    envs:
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        scope: RUN_AND_BUILD_TIME
+        value: REPLACE_WITH_SUPABASE_URL
+      - key: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: REPLACE_WITH_SUPABASE_PUBLISHABLE_KEY
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: REPLACE_WITH_SUPABASE_SERVICE_ROLE_KEY
