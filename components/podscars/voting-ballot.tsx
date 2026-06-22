@@ -8,9 +8,28 @@ import { Progress } from "@/components/ui/progress"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import type { PodscarsCategory, PodscarsFinalistGroup } from "@/lib/podscars-data"
 
 type BallotState = Record<string, string>
+type DuplicateAction = "keep"
+
+type DuplicateVote = {
+  categoryId: string
+  categoryTitle: string
+  existingNomineeName: string
+  newNomineeName: string
+  awardYear: number
+}
 
 type VotingBallotProps = {
   categories: PodscarsCategory[]
@@ -26,6 +45,7 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState("")
+  const [duplicateVotes, setDuplicateVotes] = useState<DuplicateVote[]>([])
   const ballotCategories = categories.filter((category) =>
     finalists.some((finalistGroup) => finalistGroup.categoryId === category.id),
   )
@@ -44,7 +64,7 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
     [ballot, ballotCategories, finalists],
   )
 
-  async function handleSubmit() {
+  async function handleSubmit(duplicateAction?: DuplicateAction) {
     setIsSubmitting(true)
     setSubmitted(false)
     setError("")
@@ -65,10 +85,16 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
           voterName,
           voterEmail,
           votes,
+          duplicateAction,
         }),
       })
 
       const data = await response.json()
+
+      if (response.status === 409 && Array.isArray(data.duplicateVotes)) {
+        setDuplicateVotes(data.duplicateVotes)
+        return
+      }
 
       if (!response.ok) {
         setError(data.error || "We could not save your vote.")
@@ -76,6 +102,7 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
       }
 
       setSubmitted(true)
+      setDuplicateVotes([])
     } catch (submissionError) {
       console.error(submissionError)
       setError("We could not save your vote.")
@@ -93,7 +120,7 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
               <div>
                 <CardTitle className="text-2xl text-slate-950">Public ballot</CardTitle>
                 <CardDescription className="text-base text-slate-600">
-                  One vote per category. Each submission is saved to Supabase and repeat votes update the existing record.
+                  One vote per email, per category, per year. Existing category votes cannot be replaced.
                 </CardDescription>
               </div>
               <div className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
@@ -136,6 +163,7 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
                     setBallot((current) => ({ ...current, [category.id]: value }))
                     setSubmitted(false)
                     setError("")
+                    setDuplicateVotes([])
                   }}
                   className="space-y-3"
                 >
@@ -182,6 +210,7 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
               onChange={(event) => {
                 setVoterName(event.target.value)
                 setError("")
+                setDuplicateVotes([])
               }}
             />
           </div>
@@ -199,6 +228,7 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
               onChange={(event) => {
                 setVoterEmail(event.target.value)
                 setError("")
+                setDuplicateVotes([])
               }}
             />
           </div>
@@ -212,7 +242,7 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
 
           <Button
             className="w-full bg-[hsl(42,96%,54%)] text-slate-950 hover:bg-[hsl(42,96%,48%)]"
-            onClick={handleSubmit}
+            onClick={() => handleSubmit()}
             disabled={isSubmitting || completedCount !== ballotCategories.length || !ballotCategories.length || !isOpen}
           >
             {isSubmitting ? (
@@ -235,11 +265,50 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
                 <CheckCircle2 className="h-4 w-4" />
                 Ballot saved
               </div>
-              <p>Your Podscars votes are now being stored live. Submitting again will update your choices.</p>
+              <p>Your Podscars votes are now stored live. Repeat votes in the same category stay locked.</p>
             </div>
           ) : null}
         </CardContent>
       </Card>
+
+      <AlertDialog open={duplicateVotes.length > 0} onOpenChange={(open) => !open && setDuplicateVotes([])}>
+        <AlertDialogContent className="max-h-[90vh] overflow-y-auto">
+          <AlertDialogHeader>
+            <AlertDialogTitle>You already voted in this category</AlertDialogTitle>
+            <AlertDialogDescription>
+              This email has an existing vote for the same category this year. Existing votes stay locked, but any new
+              category votes can still be saved.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-3">
+            {duplicateVotes.map((duplicate) => (
+              <div key={duplicate.categoryId} className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <p className="font-semibold text-slate-950">{duplicate.categoryTitle}</p>
+                <div className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
+                  <div>
+                    <p className="text-slate-500">Current vote</p>
+                    <p className="font-medium text-slate-900">{duplicate.existingNomineeName}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500">New selection</p>
+                    <p className="font-medium text-slate-900">{duplicate.newNomineeName}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-slate-950 text-white hover:bg-slate-800"
+              disabled={isSubmitting}
+              onClick={() => handleSubmit("keep")}
+            >
+              Keep existing votes
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

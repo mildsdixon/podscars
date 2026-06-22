@@ -103,11 +103,11 @@ export function NominationForm({ categories, isOpen, closedMessage }: Nomination
             <Label htmlFor="category">Category</Label>
             <Select
               value={form.categoryId}
-                onValueChange={(value) => {
-                  setForm((current) => ({ ...current, categoryId: value }))
-                  setSubmitted(false)
-                  setError("")
-                }}
+              onValueChange={(value) => {
+                setForm((current) => ({ ...current, categoryId: value }))
+                setSubmitted(false)
+                setError("")
+              }}
             >
               <SelectTrigger id="category">
                 <SelectValue placeholder="Choose a category" />
@@ -151,7 +151,7 @@ export function NominationForm({ categories, isOpen, closedMessage }: Nomination
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="link">Reference link</Label>
+            <Label htmlFor="link">Reference link (optional)</Label>
             <div className="relative">
               <Link2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
@@ -168,7 +168,7 @@ export function NominationForm({ categories, isOpen, closedMessage }: Nomination
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="reason">Why this nominee?</Label>
+            <Label htmlFor="reason">Why this nominee? (optional)</Label>
             <Textarea
               id="reason"
               placeholder="What made them stand out this year? Mention chemistry, impact, originality, fandom, or a specific moment."
@@ -197,17 +197,17 @@ export function NominationForm({ categories, isOpen, closedMessage }: Nomination
             </div>
 
             <div className="space-y-2">
-            <Label htmlFor="submittedBy">Your name or handle</Label>
-            <Input
-              id="submittedBy"
-              placeholder="@yourhandle or your name"
-              value={form.submittedBy}
-              onChange={(event) => {
-                setForm((current) => ({ ...current, submittedBy: event.target.value }))
-                setError("")
-              }}
-            />
-          </div>
+              <Label htmlFor="submittedBy">Your name or handle</Label>
+              <Input
+                id="submittedBy"
+                placeholder="@yourhandle or your name"
+                value={form.submittedBy}
+                onChange={(event) => {
+                  setForm((current) => ({ ...current, submittedBy: event.target.value }))
+                  setError("")
+                }}
+              />
+            </div>
           </div>
 
           <Button
@@ -257,8 +257,8 @@ export function NominationForm({ categories, isOpen, closedMessage }: Nomination
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
             <p className="font-semibold text-white">What makes a strong nomination</p>
             <p className="mt-2">
-              Include a recognizable title, a supporting link, and one memorable reason. That gives your review team
-              enough context to merge duplicates and verify the entry quickly.
+              A recognizable nominee name and show or release title are enough to submit. Add a link or note only when
+              it helps your review team verify the entry faster.
             </p>
           </div>
 

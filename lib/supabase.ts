@@ -43,6 +43,7 @@ export type SupabaseVoteRow = {
   nominee_name: string
   voter_name: string
   voter_email: string
+  award_year: number
   user_id: string | null
   submitted_at: string
 }

@@ -4,6 +4,7 @@ import { SignOutButton } from "@/components/podscars/sign-out-button"
 import { Badge } from "@/components/ui/badge"
 import { getAdminSettings, isAdminAuthenticated } from "@/lib/podscars-admin"
 import { getPodscarsAuthContext } from "@/lib/podscars-auth"
+import { getPodscarsContent } from "@/lib/podscars-content"
 import { getPodscarsLiveData, type PodscarsLiveData } from "@/lib/podscars-live"
 import { isSupabaseConfigured } from "@/lib/supabase"
 
@@ -32,7 +33,7 @@ export default async function AdminPage() {
       )
     }
 
-    const [settings, liveData] = await Promise.all([getAdminSettings(), getPodscarsLiveData()])
+    const [settings, liveData, content] = await Promise.all([getAdminSettings(), getPodscarsLiveData(), getPodscarsContent()])
 
     return (
       <div className="min-h-screen bg-slate-50">
@@ -50,6 +51,8 @@ export default async function AdminPage() {
           <AdminDashboard
             initialSettings={settings}
             nominations={liveData.nominations}
+            categories={content.categories}
+            contentSource={content.source}
             stats={liveData.stats}
             source={liveData.source}
             authMode="supabase"
@@ -65,7 +68,7 @@ export default async function AdminPage() {
     redirect("/admin/login")
   }
 
-  const [settings, liveData] = await Promise.all([
+  const [settings, liveData, content] = await Promise.all([
     getAdminSettings(),
     isSupabaseConfigured()
       ? getPodscarsLiveData()
@@ -81,6 +84,7 @@ export default async function AdminPage() {
           },
           leaderboard: [],
         }),
+    getPodscarsContent(),
   ])
 
   return (
@@ -99,6 +103,8 @@ export default async function AdminPage() {
         <AdminDashboard
           initialSettings={settings}
           nominations={liveData.nominations}
+          categories={content.categories}
+          contentSource={content.source}
           stats={liveData.stats}
           source={liveData.source}
           authMode="password"

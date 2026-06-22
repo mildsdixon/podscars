@@ -13,7 +13,7 @@ const nominationSchema = z.object({
   nomineeName: z.string().min(1),
   projectTitle: z.string().min(1),
   link: z.string().url().optional().or(z.literal("")),
-  reason: z.string().min(10),
+  reason: z.string().optional().or(z.literal("")),
   submittedBy: z.string().min(1),
   submitterEmail: z.string().email(),
 })
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
         nominee_name: parsed.data.nomineeName,
         project_title: parsed.data.projectTitle,
         reference_link: parsed.data.link || null,
-        reason: parsed.data.reason,
+        reason: parsed.data.reason || "",
         submitted_by: parsed.data.submittedBy,
         submitter_email: user?.email?.toLowerCase() || parsed.data.submitterEmail.toLowerCase(),
         user_id: user?.id ?? null,

@@ -36,6 +36,10 @@ Add your live content to:
 - `categories`
 - `finalists`
 
+To seed the current Podscars podcast nomination categories, run:
+
+- [supabase/seed-categories.sql](/Users/mildsdixon/Documents/AI%20New/projects/podscars/supabase/seed-categories.sql)
+
 Suggested category columns:
 
 - `id`

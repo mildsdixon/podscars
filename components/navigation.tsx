@@ -3,15 +3,20 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
-import { LogIn, Menu, Mic2, Shield, Trophy, Vote } from "lucide-react"
+import { LogIn, Menu, Mic2, MonitorPlay, Shield, Trophy, Vote } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
 const navItems = [
   { href: "/", label: "Overview", icon: Trophy },
-  { href: "/nominate", label: "Nominate", icon: Mic2 },
+  { href: "/nominate", label: "Podcast Nominations", icon: Mic2 },
+  { href: "/streaming-nominations", label: "Streaming Nominations", icon: MonitorPlay },
   { href: "/vote", label: "Vote", icon: Vote },
   { href: "/planning", label: "Planning", icon: Trophy },
+]
+
+const mobileNavItems = [
+  ...navItems,
   { href: "/login", label: "User Login", icon: LogIn },
   { href: "/admin/login", label: "Admin Login", icon: Shield },
 ]
@@ -24,18 +29,17 @@ export function Navigation() {
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/75">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 md:px-6">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="rounded-2xl bg-slate-950 p-2.5 text-amber-300">
-            <Trophy className="h-5 w-5" />
-          </div>
-          <div>
-            <p className="text-lg font-semibold tracking-tight text-slate-950">The Podscars</p>
-            <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Awards platform</p>
-          </div>
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 md:px-6">
+        <Link href="/" className="flex min-w-0 shrink-0 items-center">
+          <img
+            src="/podscars-logo.png"
+            alt="Podscars"
+            className="h-9 w-auto max-w-[160px] object-contain sm:max-w-[190px] lg:h-10 lg:max-w-[220px]"
+          />
+          <span className="sr-only">The Podscars Awards platform</span>
         </Link>
 
-        <div className="hidden items-center gap-7 md:flex">
+        <div className="hidden flex-1 items-center justify-center gap-4 lg:flex xl:gap-6">
           {navItems.map((item) => {
             const Icon = item.icon
             const active = isActive(item.href)
@@ -48,31 +52,33 @@ export function Navigation() {
                   active ? "text-rose-600" : "text-slate-600 hover:text-slate-950"
                 }`}
               >
-                <Icon className="h-4 w-4" />
-                <span>{item.label}</span>
+                <Icon className="h-4 w-4 shrink-0" />
+                <span className="whitespace-nowrap">{item.label}</span>
               </Link>
             )
           })}
         </div>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden shrink-0 items-center gap-2 2xl:flex">
           <Link href="/login">
-            <Button variant="ghost" className="text-slate-700 hover:bg-slate-100 hover:text-slate-950">
+            <Button size="sm" variant="ghost" className="text-slate-700 hover:bg-slate-100 hover:text-slate-950">
               User login
             </Button>
           </Link>
           <Link href="/admin/login">
-            <Button variant="outline" className="border-slate-300 text-slate-950 hover:bg-slate-100">
+            <Button size="sm" variant="outline" className="border-slate-300 text-slate-950 hover:bg-slate-100">
               Admin login
             </Button>
           </Link>
           <Link href="/nominate">
-            <Button className="bg-[hsl(355,78%,54%)] text-white hover:bg-[hsl(355,78%,48%)]">Open nominations</Button>
+            <Button size="sm" className="bg-[hsl(355,78%,54%)] text-white hover:bg-[hsl(355,78%,48%)]">
+              Open nominations
+            </Button>
           </Link>
         </div>
 
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild className="md:hidden">
+          <SheetTrigger asChild className="lg:hidden">
             <Button variant="ghost" size="icon">
               <Menu className="h-6 w-6" />
               <span className="sr-only">Toggle menu</span>
@@ -80,7 +86,7 @@ export function Navigation() {
           </SheetTrigger>
           <SheetContent side="right" className="w-80">
             <div className="mt-8 flex flex-col space-y-4">
-              {navItems.map((item) => {
+              {mobileNavItems.map((item) => {
                 const Icon = item.icon
                 const active = isActive(item.href)
 

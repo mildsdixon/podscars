@@ -11,21 +11,37 @@ import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { SignOutButton } from "@/components/podscars/sign-out-button"
 import type { AdminSettings } from "@/lib/podscars-admin"
+import type { PodscarsCategory } from "@/lib/podscars-data"
 import type { LiveNomination, PodscarsLiveData } from "@/lib/podscars-live"
 
 type AdminDashboardProps = {
   initialSettings: AdminSettings
   nominations: LiveNomination[]
+  categories: PodscarsCategory[]
+  contentSource: "fallback" | "supabase"
   stats: PodscarsLiveData["stats"]
   source: PodscarsLiveData["source"]
   authMode: "password" | "supabase"
 }
 
 const nominationStatuses = ["New", "In Review", "Approved", "Finalist", "Rejected"]
+const categoryTypes = [
+  { value: "person", label: "People" },
+  { value: "podcast", label: "Podcasts" },
+  { value: "movie", label: "Movies" },
+] as const
 
-export function AdminDashboard({ initialSettings, nominations, stats, source, authMode }: AdminDashboardProps) {
+export function AdminDashboard({ initialSettings, nominations, categories, contentSource, stats, source, authMode }: AdminDashboardProps) {
   const [settings, setSettings] = useState(initialSettings)
   const [nominationItems, setNominationItems] = useState(nominations)
+  const [categoryItems, setCategoryItems] = useState(categories)
+  const [categoryForm, setCategoryForm] = useState({
+    title: "",
+    type: "podcast" as PodscarsCategory["type"],
+    description: "",
+    nominationPrompt: "",
+  })
+  const [categorySaveState, setCategorySaveState] = useState<"idle" | "saving" | "saved" | "preview">("idle")
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle")
   const [error, setError] = useState("")
   const [pendingStatusId, setPendingStatusId] = useState<string | null>(null)
@@ -91,6 +107,56 @@ export function AdminDashboard({ initialSettings, nominations, stats, source, au
     }
   }
 
+  async function handleAddCategory() {
+    setCategorySaveState("saving")
+    setError("")
+
+    if (!categoryForm.title || !categoryForm.description || !categoryForm.nominationPrompt) {
+      setError("Add a title, description, and nomination prompt for the category.")
+      setCategorySaveState("idle")
+      return
+    }
+
+    if (contentSource === "fallback") {
+      setCategoryItems((current) => [
+        ...current,
+        {
+          id: categoryForm.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""),
+          ...categoryForm,
+        },
+      ])
+      setCategoryForm({ title: "", type: "podcast", description: "", nominationPrompt: "" })
+      setCategorySaveState("preview")
+      return
+    }
+
+    try {
+      const response = await fetch("/api/admin/categories", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(categoryForm),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.error || "Could not save category.")
+        setCategorySaveState("idle")
+        return
+      }
+
+      setCategoryItems((current) => [...current, data.category])
+      setCategoryForm({ title: "", type: "podcast", description: "", nominationPrompt: "" })
+      setCategorySaveState("saved")
+    } catch (categoryError) {
+      console.error(categoryError)
+      setError("Could not save category.")
+      setCategorySaveState("idle")
+    }
+  }
+
   return (
     <div className="space-y-6">
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -119,6 +185,122 @@ export function AdminDashboard({ initialSettings, nominations, stats, source, au
           </CardHeader>
         </Card>
       </section>
+
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle className="text-3xl text-slate-950">Nomination categories</CardTitle>
+          <CardDescription className="text-base text-slate-600">
+            Add the categories fans can choose from on the nomination form.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+          <div className="space-y-4 rounded-3xl border border-slate-200 p-5">
+            <div className="space-y-2">
+              <Label htmlFor="category-title">Category title</Label>
+              <Input
+                id="category-title"
+                value={categoryForm.title}
+                onChange={(event) => {
+                  setCategoryForm((current) => ({ ...current, title: event.target.value }))
+                  setCategorySaveState("idle")
+                }}
+                placeholder="Best New Podcast"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="category-type">Category type</Label>
+              <Select
+                value={categoryForm.type}
+                onValueChange={(value: PodscarsCategory["type"]) => {
+                  setCategoryForm((current) => ({ ...current, type: value }))
+                  setCategorySaveState("idle")
+                }}
+              >
+                <SelectTrigger id="category-type">
+                  <SelectValue placeholder="Choose a type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categoryTypes.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="category-description">Description</Label>
+              <Textarea
+                id="category-description"
+                value={categoryForm.description}
+                onChange={(event) => {
+                  setCategoryForm((current) => ({ ...current, description: event.target.value }))
+                  setCategorySaveState("idle")
+                }}
+                placeholder="What this award recognizes."
+                className="min-h-24"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="category-prompt">Nomination prompt</Label>
+              <Textarea
+                id="category-prompt"
+                value={categoryForm.nominationPrompt}
+                onChange={(event) => {
+                  setCategoryForm((current) => ({ ...current, nominationPrompt: event.target.value }))
+                  setCategorySaveState("idle")
+                }}
+                placeholder="Nominate a show, host, movie, or creator."
+                className="min-h-24"
+              />
+            </div>
+
+            <Button className="w-full bg-slate-950 text-white hover:bg-slate-800" onClick={handleAddCategory} disabled={categorySaveState === "saving"}>
+              {categorySaveState === "saving" ? (
+                <>
+                  <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                  Saving category
+                </>
+              ) : categorySaveState === "saved" ? (
+                <>
+                  <ShieldCheck className="mr-2 h-4 w-4" />
+                  Category saved
+                </>
+              ) : categorySaveState === "preview" ? (
+                "Added to preview"
+              ) : (
+                "Add category"
+              )}
+            </Button>
+
+            {contentSource === "fallback" ? (
+              <p className="text-sm text-amber-700">
+                This preview is not connected to Supabase, so added categories only appear until the page refreshes.
+              </p>
+            ) : null}
+          </div>
+
+          <div className="space-y-3">
+            {categoryItems.map((category) => (
+              <div key={category.id} className="rounded-2xl border border-slate-200 p-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p className="font-semibold text-slate-950">{category.title}</p>
+                    <p className="mt-1 text-sm text-slate-600">{category.description}</p>
+                  </div>
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold capitalize text-slate-700">
+                    {category.type}
+                  </span>
+                </div>
+                <p className="mt-3 text-sm text-slate-500">{category.nominationPrompt}</p>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       <section className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
         <Card className="bg-white">

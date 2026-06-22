@@ -32,6 +32,10 @@ export async function getSupabaseAuthState() {
     error: userError,
   } = await supabase.auth.getUser()
 
+  if (userError?.name === "AuthSessionMissingError") {
+    return { user: null, profile: null }
+  }
+
   if (userError) {
     throw userError
   }

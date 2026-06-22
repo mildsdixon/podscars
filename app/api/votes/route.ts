@@ -17,7 +17,13 @@ const ballotSchema = z.object({
   voterName: z.string().min(1),
   voterEmail: z.string().email(),
   votes: z.array(voteSchema).min(1),
+  awardYear: z.number().int().min(2000).max(2100).optional(),
+  duplicateAction: z.enum(["keep", "overwrite"]).optional(),
 })
+
+function getCurrentAwardYear() {
+  return new Date().getFullYear()
+}
 
 export async function POST(request: Request) {
   const settings = await getAdminSettings()
@@ -43,31 +49,87 @@ export async function POST(request: Request) {
       data: { user },
     } = await authClient.auth.getUser()
     const normalizedEmail = user?.email?.toLowerCase() || parsed.data.voterEmail.toLowerCase()
+    const awardYear = parsed.data.awardYear ?? getCurrentAwardYear()
     const supabase = getSupabaseAdminClient()
-    const payload = parsed.data.votes.map((vote) => ({
-      category_id: vote.categoryId,
-      category_title: vote.categoryTitle,
-      nominee_name: vote.nomineeName,
-      voter_name: parsed.data.voterName,
-      voter_email: normalizedEmail,
-      user_id: user?.id ?? null,
-      submitted_at: new Date().toISOString(),
+    const categoryIds = parsed.data.votes.map((vote) => vote.categoryId)
+    const { data: existingVotes, error: existingError } = await supabase
+      .from("votes")
+      .select("category_id, category_title, nominee_name, award_year")
+      .eq("voter_email", normalizedEmail)
+      .eq("award_year", awardYear)
+      .in("category_id", categoryIds)
+
+    if (existingError) {
+      throw existingError
+    }
+
+    const existingByCategory = new Map((existingVotes || []).map((vote) => [vote.category_id, vote]))
+    const duplicateVotes = parsed.data.votes
+      .map((vote) => {
+        const existing = existingByCategory.get(vote.categoryId)
+
+        if (!existing) {
+          return null
+        }
+
+        return {
+          categoryId: vote.categoryId,
+          categoryTitle: existing.category_title || vote.categoryTitle,
+          existingNomineeName: existing.nominee_name,
+          newNomineeName: vote.nomineeName,
+          awardYear,
+        }
+      })
+      .filter((vote): vote is NonNullable<typeof vote> => Boolean(vote))
+
+    if (duplicateVotes.length && parsed.data.duplicateAction !== "keep") {
+      return NextResponse.json(
+        {
+          error: "You already voted in one or more of these categories. Existing category votes cannot be replaced.",
+          duplicateVotes,
+        },
+        { status: 409 },
+      )
+    }
+
+    const votesToSave = parsed.data.votes
+      .filter((vote) => parsed.data.duplicateAction !== "keep" || !existingByCategory.has(vote.categoryId))
+      .map((vote) => ({
+        category_id: vote.categoryId,
+        category_title: vote.categoryTitle,
+        nominee_name: vote.nomineeName,
+        voter_name: parsed.data.voterName,
+        voter_email: normalizedEmail,
+        award_year: awardYear,
+        user_id: user?.id ?? null,
+        submitted_at: new Date().toISOString(),
     }))
 
-    const { error } = await supabase.from("votes").upsert(payload, {
-      onConflict: "category_id,voter_email",
-    })
+    if (votesToSave.length) {
+      const { error } = await supabase.from("votes").insert(votesToSave)
 
-    if (error) {
-      throw error
+      if (error) {
+        throw error
+      }
     }
 
     return NextResponse.json({
       success: true,
-      message: "Your Podscars ballot has been saved.",
+      skippedDuplicates: parsed.data.duplicateAction === "keep" ? duplicateVotes.length : 0,
+      message:
+        parsed.data.duplicateAction === "keep"
+          ? "Your existing category votes were kept. Any new category votes have been saved."
+          : "Your Podscars ballot has been saved.",
     })
   } catch (error) {
     console.error("Failed to save Podscars ballot.", error)
+
+    if (typeof error === "object" && error && "code" in error && error.code === "23505") {
+      return NextResponse.json(
+        { error: "You already voted in one or more of these categories. Existing category votes cannot be replaced." },
+        { status: 409 },
+      )
+    }
 
     return NextResponse.json({ error: "We could not save your vote right now. Please try again." }, { status: 500 })
   }

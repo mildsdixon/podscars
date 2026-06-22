@@ -52,9 +52,10 @@ create table if not exists public.votes (
   nominee_name text not null,
   voter_name text not null,
   voter_email text not null,
+  award_year integer not null default extract(year from now())::integer,
   user_id uuid references public.profiles(id) on delete set null,
   submitted_at timestamptz not null default now(),
-  constraint votes_unique_voter_per_category unique (category_id, voter_email)
+  constraint votes_unique_voter_per_category_year unique (category_id, voter_email, award_year)
 );
 
 create table if not exists public.admin_settings (
