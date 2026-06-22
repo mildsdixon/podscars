@@ -23,3 +23,6 @@ services:
         scope: RUN_TIME
         type: SECRET
         value: REPLACE_WITH_SUPABASE_SERVICE_ROLE_KEY
+      - key: NPM_CONFIG_LEGACY_PEER_DEPS
+        scope: BUILD_TIME
+        value: "true"
