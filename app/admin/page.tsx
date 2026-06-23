@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { AdminDashboard } from "@/components/podscars/admin-dashboard"
 import { SignOutButton } from "@/components/podscars/sign-out-button"
 import { Badge } from "@/components/ui/badge"
+import { getAdSpots } from "@/lib/podscars-ads"
 import { getAdminSettings, isAdminAuthenticated } from "@/lib/podscars-admin"
 import { getPodscarsAuthContext } from "@/lib/podscars-auth"
 import { getPodscarsContent } from "@/lib/podscars-content"
@@ -33,7 +34,12 @@ export default async function AdminPage() {
       )
     }
 
-    const [settings, liveData, content] = await Promise.all([getAdminSettings(), getPodscarsLiveData(), getPodscarsContent()])
+    const [settings, liveData, content, adSpots] = await Promise.all([
+      getAdminSettings(),
+      getPodscarsLiveData(),
+      getPodscarsContent(),
+      getAdSpots(),
+    ])
 
     return (
       <div className="min-h-screen bg-slate-50">
@@ -56,6 +62,7 @@ export default async function AdminPage() {
             stats={liveData.stats}
             source={liveData.source}
             authMode="supabase"
+            initialAdSpots={adSpots}
           />
         </section>
       </div>
@@ -68,7 +75,7 @@ export default async function AdminPage() {
     redirect("/admin/login")
   }
 
-  const [settings, liveData, content] = await Promise.all([
+  const [settings, liveData, content, adSpots] = await Promise.all([
     getAdminSettings(),
     isSupabaseConfigured()
       ? getPodscarsLiveData()
@@ -83,8 +90,9 @@ export default async function AdminPage() {
             categoriesWithVotes: 0,
           },
           leaderboard: [],
-        }),
+    }),
     getPodscarsContent(),
+    getAdSpots(),
   ])
 
   return (
@@ -108,6 +116,7 @@ export default async function AdminPage() {
           stats={liveData.stats}
           source={liveData.source}
           authMode="password"
+          initialAdSpots={adSpots}
         />
       </section>
     </div>

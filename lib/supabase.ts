@@ -56,6 +56,15 @@ export type SupabaseAdminSettingsRow = {
   voting_message: string
 }
 
+export type SupabaseAdSpotRow = {
+  id: number
+  slot: number
+  image_url: string
+  alt_text: string | null
+  active: boolean | null
+  updated_at: string
+}
+
 export type SupabaseProfileRow = {
   id: string
   email: string

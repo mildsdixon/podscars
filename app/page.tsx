@@ -1,26 +1,17 @@
 import Link from "next/link"
-import { ArrowRight, Check, Crown, Database, Film, Mic2, Trophy, Vote } from "lucide-react"
+import { ArrowRight, Check, Trophy, Vote } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { AdvertisingCarousel } from "@/components/podscars/advertising-carousel"
+import { getAdSpots } from "@/lib/podscars-ads"
 import { getPodscarsContent } from "@/lib/podscars-content"
-import { campaignTimeline, categoryTypeLabels, organizerChecklist } from "@/lib/podscars-data"
+import { campaignTimeline, organizerChecklist } from "@/lib/podscars-data"
 import { getPodscarsLiveData, type PodscarsLiveData } from "@/lib/podscars-live"
 import { isSupabaseConfigured } from "@/lib/supabase"
 
-function formatTimestamp(value: string | null) {
-  if (!value) {
-    return "No timestamp"
-  }
-
-  return new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value))
-}
-
 export default async function HomePage() {
-  const { categories, finalists, source } = await getPodscarsContent()
+  const [{ categories, finalists, source }, adSpots] = await Promise.all([getPodscarsContent(), getAdSpots()])
   const liveData: PodscarsLiveData = isSupabaseConfigured()
     ? await getPodscarsLiveData()
     : {
@@ -42,7 +33,6 @@ export default async function HomePage() {
     { value: String(liveData.stats.uniqueVoters), label: "Voters" },
     { value: "Supabase", label: "Source" },
   ]
-  const recentNominations = liveData.nominations.slice(0, 3)
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#fff8ef_0%,#ffffff_35%,#f8fafc_100%)]">
@@ -126,121 +116,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
-        <div className="mb-8 flex items-end justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-rose-500">Live Database</p>
-            <h2 className="mt-2 font-serif text-4xl text-slate-950">Submission activity</h2>
-          </div>
-          <Link href="/planning" className="text-sm font-semibold text-slate-600 hover:text-slate-950">
-            Open live dashboard
-          </Link>
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-          <Card className="rounded-[30px] border-slate-200 bg-white">
-            <CardHeader>
-              <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-950">
-                <Database className="h-6 w-6" />
-              </div>
-              <CardTitle className="text-3xl text-slate-950">Current totals</CardTitle>
-              <CardDescription className="text-base">
-                Real counts from the live nominations and votes tables.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-3xl bg-slate-50 p-5">
-                <p className="text-sm text-slate-500">Nominations received</p>
-                <p className="mt-2 text-4xl font-semibold text-slate-950">{liveData.stats.nominations}</p>
-              </div>
-              <div className="rounded-3xl bg-slate-50 p-5">
-                <p className="text-sm text-slate-500">Votes stored</p>
-                <p className="mt-2 text-4xl font-semibold text-slate-950">{liveData.stats.votes}</p>
-              </div>
-              <div className="rounded-3xl bg-slate-50 p-5">
-                <p className="text-sm text-slate-500">Unique voters</p>
-                <p className="mt-2 text-4xl font-semibold text-slate-950">{liveData.stats.uniqueVoters}</p>
-              </div>
-              <div className="rounded-3xl bg-slate-50 p-5">
-                <p className="text-sm text-slate-500">Categories with votes</p>
-                <p className="mt-2 text-4xl font-semibold text-slate-950">{liveData.stats.categoriesWithVotes}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-[30px] border-slate-200 bg-white">
-            <CardHeader>
-              <CardTitle className="text-3xl text-slate-950">Recent nominations</CardTitle>
-              <CardDescription className="text-base">
-                Fresh submissions coming in through the live form.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {!recentNominations.length ? (
-                <div className="rounded-2xl bg-slate-50 p-5">
-                  <p className="font-semibold text-slate-950">No live submissions yet</p>
-                  <p className="mt-2 text-slate-600">
-                    {isSupabaseConfigured()
-                      ? "Once fans start nominating, entries will appear here automatically."
-                      : "Once Supabase is connected, entries will appear here automatically."}
-                  </p>
-                </div>
-              ) : null}
-              {recentNominations.map((nomination) => (
-                <div key={nomination.id} className="rounded-2xl border border-slate-200 p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="font-semibold text-slate-950">{nomination.nomineeName}</p>
-                      <p className="mt-1 text-sm text-slate-500">{nomination.categoryTitle}</p>
-                    </div>
-                    <Badge variant="secondary" className="bg-slate-100 text-slate-700">
-                      {nomination.status}
-                    </Badge>
-                  </div>
-                  <p className="mt-3 text-sm text-slate-600">
-                    Submitted by {nomination.submittedBy} on {formatTimestamp(nomination.submittedAt)}
-                  </p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
-        <div className="mb-8 flex items-end justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-rose-500">Award Categories</p>
-            <h2 className="mt-2 font-serif text-4xl text-slate-950">Categories</h2>
-          </div>
-          <Link href="/planning" className="text-sm font-semibold text-slate-600 hover:text-slate-950">
-            See the organizer plan
-          </Link>
-        </div>
-
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {categories.map((category) => {
-            const Icon = category.type === "person" ? Mic2 : category.type === "podcast" ? Crown : Film
-
-            return (
-              <Card key={category.id} className="h-full rounded-[28px] border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-                <CardHeader>
-                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-amber-800">
-                    <Icon className="h-6 w-6" />
-                  </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <CardTitle className="text-xl text-slate-950">{category.title}</CardTitle>
-                    <Badge variant="secondary" className="bg-slate-100 text-slate-600">
-                      {categoryTypeLabels[category.type]}
-                    </Badge>
-                  </div>
-                  <CardDescription className="text-base">{category.description}</CardDescription>
-                </CardHeader>
-              </Card>
-            )
-          })}
-        </div>
-      </section>
+      <AdvertisingCarousel spots={adSpots} />
 
       <section className="border-y border-slate-200 bg-slate-950 py-16 text-white">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 md:px-6 lg:grid-cols-[0.9fr_1.1fr]">

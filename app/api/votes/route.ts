@@ -82,10 +82,10 @@ export async function POST(request: Request) {
       })
       .filter((vote): vote is NonNullable<typeof vote> => Boolean(vote))
 
-    if (duplicateVotes.length && parsed.data.duplicateAction !== "keep") {
+    if (duplicateVotes.length && !parsed.data.duplicateAction) {
       return NextResponse.json(
         {
-          error: "You already voted in one or more of these categories. Existing category votes cannot be replaced.",
+          error: "You already voted in one or more of these categories. Choose whether to keep or overwrite your existing selection.",
           duplicateVotes,
         },
         { status: 409 },
@@ -103,10 +103,14 @@ export async function POST(request: Request) {
         award_year: awardYear,
         user_id: user?.id ?? null,
         submitted_at: new Date().toISOString(),
-    }))
+      }))
 
     if (votesToSave.length) {
-      const { error } = await supabase.from("votes").insert(votesToSave)
+      const write =
+        parsed.data.duplicateAction === "overwrite"
+          ? supabase.from("votes").upsert(votesToSave, { onConflict: "category_id,voter_email,award_year" })
+          : supabase.from("votes").insert(votesToSave)
+      const { error } = await write
 
       if (error) {
         throw error
@@ -119,6 +123,8 @@ export async function POST(request: Request) {
       message:
         parsed.data.duplicateAction === "keep"
           ? "Your existing category votes were kept. Any new category votes have been saved."
+          : parsed.data.duplicateAction === "overwrite"
+            ? "Your existing category votes were overwritten with your new selections."
           : "Your Podscars ballot has been saved.",
     })
   } catch (error) {
@@ -126,7 +132,7 @@ export async function POST(request: Request) {
 
     if (typeof error === "object" && error && "code" in error && error.code === "23505") {
       return NextResponse.json(
-        { error: "You already voted in one or more of these categories. Existing category votes cannot be replaced." },
+        { error: "You already voted in one or more of these categories. Please submit again and choose whether to keep or overwrite your selection." },
         { status: 409 },
       )
     }

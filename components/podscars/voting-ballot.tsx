@@ -21,7 +21,7 @@ import {
 import type { PodscarsCategory, PodscarsFinalistGroup } from "@/lib/podscars-data"
 
 type BallotState = Record<string, string>
-type DuplicateAction = "keep"
+type DuplicateAction = "keep" | "overwrite"
 
 type DuplicateVote = {
   categoryId: string
@@ -120,7 +120,8 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
               <div>
                 <CardTitle className="text-2xl text-slate-950">Public ballot</CardTitle>
                 <CardDescription className="text-base text-slate-600">
-                  One vote per email, per category, per year. Existing category votes cannot be replaced.
+                  One vote per email, per category, per year. If you already voted in a category, you can keep the old
+                  choice or overwrite it.
                 </CardDescription>
               </div>
               <div className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
@@ -265,7 +266,7 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
                 <CheckCircle2 className="h-4 w-4" />
                 Ballot saved
               </div>
-              <p>Your Podscars votes are now stored live. Repeat votes in the same category stay locked.</p>
+              <p>Your Podscars votes are now stored live.</p>
             </div>
           ) : null}
         </CardContent>
@@ -276,8 +277,8 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
           <AlertDialogHeader>
             <AlertDialogTitle>You already voted in this category</AlertDialogTitle>
             <AlertDialogDescription>
-              This email has an existing vote for the same category this year. Existing votes stay locked, but any new
-              category votes can still be saved.
+              This email has an existing vote for the same category this year. Choose whether to keep the old selection
+              or overwrite it with the new one.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-3">
@@ -304,7 +305,14 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
               disabled={isSubmitting}
               onClick={() => handleSubmit("keep")}
             >
-              Keep existing votes
+              Keep old selection
+            </AlertDialogAction>
+            <AlertDialogAction
+              className="bg-[hsl(355,78%,54%)] text-white hover:bg-[hsl(355,78%,48%)]"
+              disabled={isSubmitting}
+              onClick={() => handleSubmit("overwrite")}
+            >
+              Overwrite with new selection
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

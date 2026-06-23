@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { LoaderCircle, Save, Settings2, ShieldCheck } from "lucide-react"
+import { ImageIcon, LoaderCircle, Save, Settings2, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { SignOutButton } from "@/components/podscars/sign-out-button"
+import type { AdSpot } from "@/lib/podscars-ads"
 import type { AdminSettings } from "@/lib/podscars-admin"
 import type { PodscarsCategory } from "@/lib/podscars-data"
 import type { LiveNomination, PodscarsLiveData } from "@/lib/podscars-live"
@@ -22,6 +23,7 @@ type AdminDashboardProps = {
   stats: PodscarsLiveData["stats"]
   source: PodscarsLiveData["source"]
   authMode: "password" | "supabase"
+  initialAdSpots: AdSpot[]
 }
 
 const nominationStatuses = ["New", "In Review", "Approved", "Finalist", "Rejected"]
@@ -31,10 +33,20 @@ const categoryTypes = [
   { value: "movie", label: "Movies" },
 ] as const
 
-export function AdminDashboard({ initialSettings, nominations, categories, contentSource, stats, source, authMode }: AdminDashboardProps) {
+export function AdminDashboard({
+  initialSettings,
+  nominations,
+  categories,
+  contentSource,
+  stats,
+  source,
+  authMode,
+  initialAdSpots,
+}: AdminDashboardProps) {
   const [settings, setSettings] = useState(initialSettings)
   const [nominationItems, setNominationItems] = useState(nominations)
   const [categoryItems, setCategoryItems] = useState(categories)
+  const [adSpotItems, setAdSpotItems] = useState(initialAdSpots)
   const [categoryForm, setCategoryForm] = useState({
     title: "",
     type: "podcast" as PodscarsCategory["type"],
@@ -42,6 +54,8 @@ export function AdminDashboard({ initialSettings, nominations, categories, conte
     nominationPrompt: "",
   })
   const [categorySaveState, setCategorySaveState] = useState<"idle" | "saving" | "saved" | "preview">("idle")
+  const [adSaveState, setAdSaveState] = useState<"idle" | "saving" | "saved">("idle")
+  const [uploadingAdId, setUploadingAdId] = useState<number | null>(null)
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle")
   const [error, setError] = useState("")
   const [pendingStatusId, setPendingStatusId] = useState<string | null>(null)
@@ -157,6 +171,82 @@ export function AdminDashboard({ initialSettings, nominations, categories, conte
     }
   }
 
+  async function handleSaveAdSpots() {
+    setAdSaveState("saving")
+    setError("")
+
+    try {
+      const response = await fetch("/api/admin/ad-spots", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ spots: adSpotItems }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.error || "Could not save advertising spots.")
+        setAdSaveState("idle")
+        return
+      }
+
+      setAdSpotItems(data.spots)
+      setAdSaveState("saved")
+    } catch (adError) {
+      console.error(adError)
+      setError("Could not save advertising spots.")
+      setAdSaveState("idle")
+    }
+  }
+
+  async function handleAdImageUpload(spot: AdSpot, file: File | undefined) {
+    if (!file) {
+      return
+    }
+
+    setUploadingAdId(spot.id)
+    setAdSaveState("idle")
+    setError("")
+
+    try {
+      const formData = new FormData()
+      formData.append("slot", String(spot.slot))
+      formData.append("file", file)
+
+      const response = await fetch("/api/admin/ad-spots/upload", {
+        method: "POST",
+        body: formData,
+      })
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.error || "Could not upload ad image.")
+        return
+      }
+
+      setAdSpotItems((current) =>
+        current.map((item) =>
+          item.id === spot.id
+            ? data.spot || {
+                ...item,
+                imageUrl: data.url,
+                altText: data.altText || item.altText,
+                active: true,
+              }
+            : item,
+        ),
+      )
+      setAdSaveState("saved")
+    } catch (uploadError) {
+      console.error(uploadError)
+      setError("Could not upload ad image.")
+    } finally {
+      setUploadingAdId(null)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -185,6 +275,115 @@ export function AdminDashboard({ initialSettings, nominations, categories, conte
           </CardHeader>
         </Card>
       </section>
+
+      <Card className="bg-white">
+        <CardHeader>
+          <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-950 text-amber-300">
+            <ImageIcon className="h-6 w-6" />
+          </div>
+          <CardTitle className="text-3xl text-slate-950">Advertising</CardTitle>
+          <CardDescription className="text-base text-slate-600">
+            Manage the five 1200 x 628 homepage slideshow ads.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <div className="grid gap-4 xl:grid-cols-5">
+            {adSpotItems.map((spot, index) => (
+              <div key={spot.id} className="space-y-4 rounded-3xl border border-slate-200 p-4">
+                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
+                  <img
+                    src={spot.imageUrl}
+                    alt={spot.altText}
+                    className="aspect-[1200/628] w-full object-cover"
+                    onError={(event) => {
+                      event.currentTarget.src = "/placeholder.jpg"
+                    }}
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <p className="font-semibold text-slate-950">Ad spot {index + 1}</p>
+                  <Switch
+                    checked={spot.active}
+                    onCheckedChange={(checked) => {
+                      setAdSpotItems((current) =>
+                        current.map((item) => (item.id === spot.id ? { ...item, active: checked } : item)),
+                      )
+                      setAdSaveState("idle")
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`ad-file-${spot.id}`}>Upload JPG/PNG</Label>
+                  <Input
+                    id={`ad-file-${spot.id}`}
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,.jpg,.jpeg,.png"
+                    disabled={uploadingAdId === spot.id}
+                    onChange={(event) => {
+                      void handleAdImageUpload(spot, event.target.files?.[0])
+                      event.target.value = ""
+                    }}
+                  />
+                  <p className="text-xs text-slate-500">JPG or PNG only. Best size: 1200 x 628.</p>
+                  {uploadingAdId === spot.id ? (
+                    <p className="flex items-center text-sm text-slate-500">
+                      <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                      Uploading image
+                    </p>
+                  ) : null}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`ad-url-${spot.id}`}>Image URL</Label>
+                  <Input
+                    id={`ad-url-${spot.id}`}
+                    value={spot.imageUrl}
+                    onChange={(event) => {
+                      setAdSpotItems((current) =>
+                        current.map((item) => (item.id === spot.id ? { ...item, imageUrl: event.target.value } : item)),
+                      )
+                      setAdSaveState("idle")
+                    }}
+                    placeholder="/path-or-https-url.png"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`ad-alt-${spot.id}`}>Alt text</Label>
+                  <Input
+                    id={`ad-alt-${spot.id}`}
+                    value={spot.altText}
+                    onChange={(event) => {
+                      setAdSpotItems((current) =>
+                        current.map((item) => (item.id === spot.id ? { ...item, altText: event.target.value } : item)),
+                      )
+                      setAdSaveState("idle")
+                    }}
+                    placeholder="Sponsor ad description"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Button className="w-full bg-slate-950 text-white hover:bg-slate-800" onClick={handleSaveAdSpots} disabled={adSaveState === "saving"}>
+            {adSaveState === "saving" ? (
+              <>
+                <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                Saving ads
+              </>
+            ) : adSaveState === "saved" ? (
+              <>
+                <ShieldCheck className="mr-2 h-4 w-4" />
+                Ads saved
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Save advertising spots
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
 
       <Card className="bg-white">
         <CardHeader>
