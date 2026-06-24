@@ -1,17 +1,17 @@
 import Link from "next/link"
-import { ArrowRight, Check, Trophy, Vote } from "lucide-react"
+import { ArrowRight, Trophy } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { AdvertisingCarousel } from "@/components/podscars/advertising-carousel"
 import { getAdSpots } from "@/lib/podscars-ads"
 import { getPodscarsContent } from "@/lib/podscars-content"
-import { campaignTimeline, organizerChecklist } from "@/lib/podscars-data"
+import { campaignTimeline } from "@/lib/podscars-data"
 import { getPodscarsLiveData, type PodscarsLiveData } from "@/lib/podscars-live"
 import { isSupabaseConfigured } from "@/lib/supabase"
 
 export default async function HomePage() {
-  const [{ categories, finalists, source }, adSpots] = await Promise.all([getPodscarsContent(), getAdSpots()])
+  const [{ categories, source }, adSpots] = await Promise.all([getPodscarsContent(), getAdSpots()])
   const liveData: PodscarsLiveData = isSupabaseConfigured()
     ? await getPodscarsLiveData()
     : {
@@ -138,60 +138,6 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
-      </section>
-
-      <section className="mx-auto grid max-w-7xl gap-10 px-4 py-16 md:px-6 lg:grid-cols-[1fr_1fr]">
-        <Card className="rounded-[30px] border-slate-200 bg-white">
-          <CardHeader>
-            <CardTitle className="text-3xl text-slate-950">Checklist</CardTitle>
-            <CardDescription className="text-base">Keep it simple and fair.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {organizerChecklist.map((item) => (
-              <div key={item} className="flex gap-3 rounded-2xl bg-slate-50 p-4">
-                <div className="mt-0.5 rounded-full bg-emerald-100 p-1 text-emerald-700">
-                  <Check className="h-4 w-4" />
-                </div>
-                <p className="text-slate-700">{item}</p>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-[30px] border-0 bg-[linear-gradient(135deg,#be123c,#0f172a)] text-white">
-          <CardHeader>
-            <CardTitle className="text-3xl">Ballot preview</CardTitle>
-            <CardDescription className="text-rose-100">A sample of the voting layout.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {!finalists.length ? (
-              <div className="rounded-2xl bg-white/10 p-5 backdrop-blur">
-                <p className="text-lg font-semibold">No finalists published yet</p>
-                <p className="mt-2 text-rose-100">Add finalists in Supabase to show them here.</p>
-              </div>
-            ) : null}
-            {finalists.map((group) => {
-              const category = categories.find((item) => item.id === group.categoryId)
-
-              return (
-                <div key={group.categoryId} className="rounded-2xl bg-white/10 p-5 backdrop-blur">
-                  <p className="text-lg font-semibold">{category?.title}</p>
-                  <div className="mt-3 space-y-2">
-                    {group.nominees.map((nominee) => (
-                      <div key={nominee.name} className="flex items-center justify-between gap-4 rounded-xl bg-black/10 px-4 py-3">
-                        <div>
-                          <p className="font-medium">{nominee.name}</p>
-                          <p className="text-sm text-rose-100">{nominee.subtitle}</p>
-                        </div>
-                        <Vote className="h-4 w-4 text-amber-300" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )
-            })}
-          </CardContent>
-        </Card>
       </section>
     </div>
   )
