@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { getAdminSettings } from "@/lib/podscars-admin"
 import { getPodscarsLiveData } from "@/lib/podscars-live"
+import { NOMINATIONS_START_MESSAGE, nominationsHaveStarted } from "@/lib/podscars-nominations"
 import { createSupabaseServerClient } from "@/lib/supabase-server"
 import { getSupabaseAdminClient, isSupabaseConfigured } from "@/lib/supabase"
 
@@ -25,6 +26,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: settings.nominationsMessage }, { status: 403 })
   }
 
+  if (!nominationsHaveStarted()) {
+    return NextResponse.json({ error: NOMINATIONS_START_MESSAGE }, { status: 403 })
+  }
+
   if (!isSupabaseConfigured()) {
     return NextResponse.json({ error: "Supabase is not configured yet." }, { status: 503 })
   }
@@ -43,6 +48,30 @@ export async function POST(request: Request) {
     } = await authClient.auth.getUser()
 
     const supabase = getSupabaseAdminClient()
+    const normalizedEmail = user?.email?.toLowerCase() || parsed.data.submitterEmail.toLowerCase()
+
+    const { data: existingNominations, error: existingError } = await supabase
+      .from("nominations")
+      .select("id, category_title")
+      .eq("category_id", parsed.data.categoryId)
+      .ilike("submitter_email", normalizedEmail)
+      .limit(1)
+
+    if (existingError) {
+      throw existingError
+    }
+
+    const existingNomination = existingNominations?.[0]
+
+    if (existingNomination) {
+      return NextResponse.json(
+        {
+          error: `This email has already submitted a nomination for ${existingNomination.category_title || parsed.data.categoryTitle}. Only one nomination per email is allowed in each category.`,
+        },
+        { status: 409 },
+      )
+    }
+
     const { data: record, error } = await supabase
       .from("nominations")
       .insert({
@@ -53,7 +82,7 @@ export async function POST(request: Request) {
         reference_link: parsed.data.link || null,
         reason: parsed.data.reason || "",
         submitted_by: parsed.data.submittedBy,
-        submitter_email: user?.email?.toLowerCase() || parsed.data.submitterEmail.toLowerCase(),
+        submitter_email: normalizedEmail,
         user_id: user?.id ?? null,
         status: "New",
       })
@@ -61,6 +90,15 @@ export async function POST(request: Request) {
       .single()
 
     if (error) {
+      if (error.code === "23505") {
+        return NextResponse.json(
+          {
+            error: `This email has already submitted a nomination for ${parsed.data.categoryTitle}. Only one nomination per email is allowed in each category.`,
+          },
+          { status: 409 },
+        )
+      }
+
       throw error
     }
 

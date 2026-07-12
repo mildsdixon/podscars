@@ -2,10 +2,14 @@ import { Sparkles } from "lucide-react"
 import { NominationForm } from "@/components/podscars/nomination-form"
 import { getAdminSettings } from "@/lib/podscars-admin"
 import { getPodscarsContent } from "@/lib/podscars-content"
+import { NOMINATIONS_START_MESSAGE, nominationsHaveStarted } from "@/lib/podscars-nominations"
 
 export default async function NominatePage() {
   const { categories } = await getPodscarsContent()
   const settings = await getAdminSettings()
+  const nominationsStarted = nominationsHaveStarted()
+  const nominationsOpen = settings.nominationsOpen && nominationsStarted
+  const closedMessage = nominationsStarted ? settings.nominationsMessage : NOMINATIONS_START_MESSAGE
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#fff7ed_0%,#ffffff_30%,#f8fafc_100%)]">
@@ -27,8 +31,8 @@ export default async function NominatePage() {
       <section className="mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-14">
         <NominationForm
           categories={categories}
-          isOpen={settings.nominationsOpen}
-          closedMessage={settings.nominationsMessage}
+          isOpen={nominationsOpen}
+          closedMessage={closedMessage}
         />
       </section>
     </div>

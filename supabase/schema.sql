@@ -45,6 +45,9 @@ create table if not exists public.nominations (
   submitted_at timestamptz not null default now()
 );
 
+create unique index if not exists nominations_unique_submitter_per_category
+on public.nominations (category_id, lower(submitter_email));
+
 create table if not exists public.votes (
   id uuid primary key default gen_random_uuid(),
   category_id text not null,

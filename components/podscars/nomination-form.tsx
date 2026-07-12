@@ -95,7 +95,8 @@ export function NominationForm({ categories, isOpen, closedMessage }: Nomination
         <CardHeader>
           <CardTitle className="text-2xl text-slate-950">Submit a nomination</CardTitle>
           <CardDescription className="text-base text-slate-600">
-            Keep it simple: pick a category, name the nominee, and tell us why they deserve the Podscars spotlight.
+            Pick a category, name the nominee, and tell us why they deserve the Podscars spotlight. One email can
+            submit once per category.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -265,8 +266,8 @@ export function NominationForm({ categories, isOpen, closedMessage }: Nomination
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
             <p className="font-semibold text-white">Suggested moderation rule</p>
             <p className="mt-2">
-              Accept unlimited fan nominations, but only keep one official nominee record per unique person, show, or
-              movie before finalists are announced.
+              Each email can submit one nomination per category. The review team can still combine duplicate nominees
+              before finalists are announced.
             </p>
           </div>
 
