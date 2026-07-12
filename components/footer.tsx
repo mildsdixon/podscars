@@ -42,7 +42,7 @@ export function Footer() {
           <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Next Move</p>
           <div className="space-y-3 text-slate-600">
             <p>Pick your official awards year and nomination deadline.</p>
-            <p>Connect forms and content to Supabase.</p>
+            <p>Keep forms, categories, and ballot content updated.</p>
             <p className="flex items-center gap-2">
               <Mail className="h-4 w-4" />
               Use a branded inbox for moderation and winner outreach.

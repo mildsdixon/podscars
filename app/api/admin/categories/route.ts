@@ -48,7 +48,7 @@ export async function POST(request: Request) {
   }
 
   if (!isSupabaseConfigured()) {
-    return NextResponse.json({ error: "Supabase is not configured, so this preview cannot permanently save categories." }, { status: 503 })
+    return NextResponse.json({ error: "Live data is not configured, so this preview cannot permanently save categories." }, { status: 503 })
   }
 
   const supabase = getSupabaseAdminClient()

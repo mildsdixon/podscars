@@ -54,7 +54,7 @@ export default async function PlanningPage() {
           <CardHeader>
             <CardTitle className="text-3xl">Live totals</CardTitle>
             <CardDescription>
-              {isSupabaseConfigured() ? "Directly from Supabase." : "Waiting for Supabase configuration."}
+              {isSupabaseConfigured() ? "Directly from live submissions." : "Waiting for live data configuration."}
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2">
@@ -161,7 +161,7 @@ export default async function PlanningPage() {
           <CardHeader>
             <CardTitle className="text-3xl">Category bank</CardTitle>
             <CardDescription>
-              {categories.length} categories from {source === "supabase" ? "Supabase" : "fallback content"}.
+              {categories.length} categories from {source === "supabase" ? "live content" : "fallback content"}.
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

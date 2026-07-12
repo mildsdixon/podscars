@@ -24,7 +24,7 @@ export default async function AdminPage() {
             <Badge className="bg-slate-950 text-white hover:bg-slate-900">Admin backend</Badge>
             <h1 className="mt-4 font-serif text-5xl text-slate-950 md:text-6xl">You're signed in, but not approved for admin.</h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-              Mark this user as an admin in the Supabase `profiles` table by setting `is_admin` to `true`, then refresh.
+              Mark this user as an admin in the account profiles table by setting `is_admin` to `true`, then refresh.
             </p>
             <div className="mt-8">
               <SignOutButton next="/" />

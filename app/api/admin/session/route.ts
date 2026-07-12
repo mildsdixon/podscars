@@ -20,7 +20,7 @@ export async function GET() {
 export async function POST(request: Request) {
   if (isSupabaseConfigured()) {
     return NextResponse.json(
-      { error: "Use the Supabase sign-in flow at /login for admin access." },
+      { error: "Use the account sign-in flow at /login for admin access." },
       { status: 405 },
     )
   }
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
 
 export async function DELETE() {
   if (isSupabaseConfigured()) {
-    return NextResponse.json({ error: "Use Supabase sign out from the app UI." }, { status: 405 })
+    return NextResponse.json({ error: "Use account sign out from the app UI." }, { status: 405 })
   }
 
   await clearAdminSession()

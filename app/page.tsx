@@ -11,7 +11,7 @@ import { getPodscarsLiveData, type PodscarsLiveData } from "@/lib/podscars-live"
 import { isSupabaseConfigured } from "@/lib/supabase"
 
 export default async function HomePage() {
-  const [{ categories, source }, adSpots] = await Promise.all([getPodscarsContent(), getAdSpots()])
+  const [{ categories }, adSpots] = await Promise.all([getPodscarsContent(), getAdSpots()])
   const liveData: PodscarsLiveData = isSupabaseConfigured()
     ? await getPodscarsLiveData()
     : {
@@ -40,7 +40,7 @@ export default async function HomePage() {
         <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-20 md:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:py-28">
           <div>
             <Badge className="mb-5 bg-slate-950 text-white hover:bg-slate-900">
-              {source === "supabase" ? "Podscars + Supabase Live Content" : "Podscars Awards Platform"}
+              Podscars Awards Platform
             </Badge>
             <h1 className="max-w-3xl font-serif text-5xl leading-tight text-slate-950 md:text-7xl">
               Podscars for nominations, voting, and winners.
@@ -76,8 +76,8 @@ export default async function HomePage() {
             </div>
             <p className="mt-4 text-sm text-slate-500">
               {isSupabaseConfigured()
-                ? `${typeCount} content types and live database-backed submissions are active.`
-                : "Add Supabase credentials and run the schema to turn the site fully live."}
+                ? `${typeCount} content types and live submissions are active.`
+                : "Connect the live data settings to turn the site fully live."}
             </p>
           </div>
 

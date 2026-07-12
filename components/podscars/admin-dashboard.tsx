@@ -249,7 +249,7 @@ export function AdminDashboard({
 
   return (
     <div className="space-y-6">
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-4 md:grid-cols-3">
         <Card className="bg-white">
           <CardHeader className="pb-2">
             <CardDescription>Nominations</CardDescription>
@@ -266,12 +266,6 @@ export function AdminDashboard({
           <CardHeader className="pb-2">
             <CardDescription>Unique voters</CardDescription>
             <CardTitle className="text-3xl">{stats.uniqueVoters}</CardTitle>
-          </CardHeader>
-        </Card>
-        <Card className="bg-slate-950 text-white">
-          <CardHeader className="pb-2">
-            <CardDescription className="text-slate-300">Data source</CardDescription>
-            <CardTitle className="text-3xl capitalize">{source}</CardTitle>
           </CardHeader>
         </Card>
       </section>
@@ -477,7 +471,7 @@ export function AdminDashboard({
 
             {contentSource === "fallback" ? (
               <p className="text-sm text-amber-700">
-                This preview is not connected to Supabase, so added categories only appear until the page refreshes.
+                This preview is not connected to live data, so added categories only appear until the page refreshes.
               </p>
             ) : null}
           </div>

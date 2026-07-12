@@ -113,7 +113,7 @@ export function AuthForm({ next, errorCode }: AuthFormProps) {
         </div>
         <CardTitle className="text-3xl text-slate-950">{mode === "sign-in" ? "Sign in" : "Create account"}</CardTitle>
         <CardDescription className="text-base text-slate-600">
-          Supabase handles accounts, sessions, and admin access for this app.
+          Secure account access for Podscars admins and members.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">

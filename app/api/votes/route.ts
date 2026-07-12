@@ -33,7 +33,7 @@ export async function POST(request: Request) {
   }
 
   if (!isSupabaseConfigured()) {
-    return NextResponse.json({ error: "Supabase is not configured yet." }, { status: 503 })
+    return NextResponse.json({ error: "Live voting is not configured yet." }, { status: 503 })
   }
 
   const payload = await request.json().catch(() => null)
@@ -144,7 +144,7 @@ export async function POST(request: Request) {
 export async function GET() {
   try {
     if (!isSupabaseConfigured()) {
-      return NextResponse.json({ error: "Supabase is not configured yet." }, { status: 503 })
+      return NextResponse.json({ error: "Live voting is not configured yet." }, { status: 503 })
     }
 
     const liveData = await getPodscarsLiveData()

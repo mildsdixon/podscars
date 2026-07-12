@@ -19,10 +19,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     return (
       <div className="min-h-screen bg-[linear-gradient(180deg,#fff8ef_0%,#ffffff_35%,#f8fafc_100%)]">
         <section className="mx-auto max-w-6xl px-4 py-16 md:px-6">
-          <Badge className="bg-slate-950 text-white hover:bg-slate-900">Supabase required</Badge>
-          <h1 className="mt-4 font-serif text-5xl text-slate-950 md:text-6xl">Connect Supabase to unlock sign-in.</h1>
+          <Badge className="bg-slate-950 text-white hover:bg-slate-900">Account setup required</Badge>
+          <h1 className="mt-4 font-serif text-5xl text-slate-950 md:text-6xl">Connect account access to unlock sign-in.</h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-            This app now expects Supabase for user accounts, authentication, and admin access.
+            This app needs live account settings for user accounts, authentication, and admin access.
           </p>
         </section>
       </div>

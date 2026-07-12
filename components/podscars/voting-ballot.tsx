@@ -137,8 +137,7 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
             <CardContent className="p-8">
               <p className="text-lg font-semibold text-slate-950">No finalists published yet</p>
               <p className="mt-2 text-slate-600">
-                Add records to the Supabase <span className="font-medium">finalists</span> table and this ballot will
-                populate automatically.
+                Add finalists in the admin backend and this ballot will populate automatically.
               </p>
             </CardContent>
           </Card>

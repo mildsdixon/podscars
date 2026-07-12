@@ -17,7 +17,7 @@ export async function GET() {
   }
 
   if (!isSupabaseConfigured()) {
-    return NextResponse.json({ error: "Supabase is not configured." }, { status: 503 })
+    return NextResponse.json({ error: "Live nominations are not configured." }, { status: 503 })
   }
 
   const liveData = await getPodscarsLiveData()
@@ -41,7 +41,7 @@ export async function PUT(request: Request) {
   }
 
   if (!isSupabaseConfigured()) {
-    return NextResponse.json({ error: "Supabase is not configured." }, { status: 503 })
+    return NextResponse.json({ error: "Live nominations are not configured." }, { status: 503 })
   }
 
   const supabase = getSupabaseAdminClient()

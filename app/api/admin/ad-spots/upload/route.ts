@@ -57,7 +57,7 @@ export async function POST(request: Request) {
   }
 
   if (!isSupabaseConfigured()) {
-    return NextResponse.json({ error: "Supabase is not configured." }, { status: 503 })
+    return NextResponse.json({ error: "Live ad storage is not configured." }, { status: 503 })
   }
 
   const formData = await request.formData().catch(() => null)
