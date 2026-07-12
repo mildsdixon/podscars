@@ -22,6 +22,40 @@ export function AuthForm({ next, errorCode }: AuthFormProps) {
   const [message, setMessage] = useState(errorCode === "auth_callback_failed" ? "We could not finish that sign-in flow. Please try again." : "")
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSendingReset, setIsSendingReset] = useState(false)
+
+  async function handlePasswordReset() {
+    setError("")
+    setMessage("")
+
+    const trimmedEmail = email.trim()
+
+    if (!trimmedEmail) {
+      setError("Enter your email address first so we can send a reset link.")
+      return
+    }
+
+    setIsSendingReset(true)
+
+    try {
+      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
+        redirectTo,
+      })
+
+      if (resetError) {
+        setError(resetError.message)
+        return
+      }
+
+      setMessage("Password reset link sent. Check your email for the next step.")
+    } catch (resetError) {
+      console.error(resetError)
+      setError("We could not send a password reset link.")
+    } finally {
+      setIsSendingReset(false)
+    }
+  }
 
   async function handleSubmit() {
     setIsSubmitting(true)
@@ -106,7 +140,19 @@ export function AuthForm({ next, errorCode }: AuthFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+          <div className="flex items-center justify-between gap-3">
+            <Label htmlFor="password">Password</Label>
+            {mode === "sign-in" ? (
+              <button
+                type="button"
+                className="text-sm font-medium text-rose-600 transition hover:text-rose-700 disabled:cursor-not-allowed disabled:text-slate-400"
+                onClick={handlePasswordReset}
+                disabled={isSendingReset}
+              >
+                {isSendingReset ? "Sending reset..." : "Forgot password?"}
+              </button>
+            ) : null}
+          </div>
           <Input
             id="password"
             type="password"
@@ -121,7 +167,7 @@ export function AuthForm({ next, errorCode }: AuthFormProps) {
           />
         </div>
 
-        <Button className="w-full bg-slate-950 text-white hover:bg-slate-800" onClick={handleSubmit} disabled={isSubmitting}>
+        <Button className="w-full bg-slate-950 text-white hover:bg-slate-800" onClick={handleSubmit} disabled={isSubmitting || isSendingReset}>
           {isSubmitting ? (
             <>
               <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
