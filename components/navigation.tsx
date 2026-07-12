@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
-import { LogIn, Menu, Mic2, MonitorPlay, Shield, Trophy, Vote } from "lucide-react"
+import { LogIn, Menu, Mic2, MonitorPlay, Trophy, Vote } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
@@ -18,7 +18,6 @@ const navItems = [
 const mobileNavItems = [
   ...navItems,
   { href: "/login", label: "User Login", icon: LogIn },
-  { href: "/admin/login", label: "Admin Login", icon: Shield },
 ]
 
 export function Navigation() {
@@ -63,11 +62,6 @@ export function Navigation() {
           <Link href="/login">
             <Button size="sm" variant="ghost" className="text-slate-700 hover:bg-slate-100 hover:text-slate-950">
               User login
-            </Button>
-          </Link>
-          <Link href="/admin/login">
-            <Button size="sm" variant="outline" className="border-slate-300 text-slate-950 hover:bg-slate-100">
-              Admin login
             </Button>
           </Link>
           <Link href="/nominate">
