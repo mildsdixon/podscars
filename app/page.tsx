@@ -31,7 +31,6 @@ export default async function HomePage() {
     { value: String(categories.length), label: "Categories" },
     { value: String(liveData.stats.nominations), label: "Nominations" },
     { value: String(liveData.stats.uniqueVoters), label: "Voters" },
-    { value: "Supabase", label: "Source" },
   ]
 
   return (
@@ -67,7 +66,7 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {stats.map((stat) => (
                 <div key={stat.label} className="rounded-3xl border border-slate-200 bg-white/80 p-5 shadow-sm">
                   <p className="text-3xl font-semibold text-slate-950">{stat.value}</p>
