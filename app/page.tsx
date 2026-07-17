@@ -58,15 +58,6 @@ export default async function HomePage() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/vote">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="w-full border-slate-300 bg-white/80 px-7 text-slate-950 hover:bg-slate-100 sm:w-auto"
-                >
-                  Open the ballot
-                </Button>
-              </Link>
             </div>
 
             <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

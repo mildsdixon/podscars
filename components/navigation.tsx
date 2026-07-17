@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
-import { LogIn, Menu, Mic2, MonitorPlay, Trophy, Vote } from "lucide-react"
+import { LogIn, Menu, Mic2, MonitorPlay, Trophy } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
@@ -11,7 +11,6 @@ const navItems = [
   { href: "/", label: "Overview", icon: Trophy },
   { href: "/nominate", label: "Podcast Nominations", icon: Mic2 },
   { href: "/streaming-nominations", label: "Streaming Nominations", icon: MonitorPlay },
-  { href: "/vote", label: "Vote", icon: Vote },
   { href: "/planning", label: "Planning", icon: Trophy },
 ]
 
@@ -100,11 +99,6 @@ export function Navigation() {
               })}
 
               <div className="space-y-2 pt-6">
-                <Link href="/vote" onClick={() => setIsOpen(false)}>
-                  <Button variant="outline" className="w-full">
-                    Preview voting
-                  </Button>
-                </Link>
                 <Link href="/nominate" onClick={() => setIsOpen(false)}>
                   <Button className="w-full bg-[hsl(355,78%,54%)] text-white hover:bg-[hsl(355,78%,48%)]">
                     Open nominations

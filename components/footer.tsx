@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Mail, Mic2, Trophy, Vote } from "lucide-react"
+import { Mail, Mic2, Trophy } from "lucide-react"
 
 export function Footer() {
   return (
@@ -26,10 +26,6 @@ export function Footer() {
             <Link href="/nominate" className="flex items-center gap-2 hover:text-slate-950">
               <Mic2 className="h-4 w-4" />
               Nomination form
-            </Link>
-            <Link href="/vote" className="flex items-center gap-2 hover:text-slate-950">
-              <Vote className="h-4 w-4" />
-              Voting ballot
             </Link>
             <Link href="/planning" className="flex items-center gap-2 hover:text-slate-950">
               <Trophy className="h-4 w-4" />
