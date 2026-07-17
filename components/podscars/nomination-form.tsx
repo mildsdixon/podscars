@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import type { PodscarsCategory } from "@/lib/podscars-data"
+import { NOMINATIONS_DEADLINE_LABEL } from "@/lib/podscars-nominations"
 
 const icons = {
   person: Mic2,
@@ -96,7 +97,7 @@ export function NominationForm({ categories, isOpen, closedMessage }: Nomination
           <CardTitle className="text-2xl text-slate-950">Submit a nomination</CardTitle>
           <CardDescription className="text-base text-slate-600">
             Pick a category, name the nominee, and tell us why they deserve the Podscars spotlight. One email can
-            submit once per category.
+            submit once per category. Nominations close {NOMINATIONS_DEADLINE_LABEL}.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -274,7 +275,8 @@ export function NominationForm({ categories, isOpen, closedMessage }: Nomination
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
             <p className="font-semibold text-white">Launch recommendation</p>
             <p className="mt-2">
-              Open nominations for 14 days, then publish 3 to 5 finalists per category for the public ballot.
+              Nominations close {NOMINATIONS_DEADLINE_LABEL}. After review, publish 3 to 5 finalists per category for
+              the public ballot.
             </p>
           </div>
         </CardContent>

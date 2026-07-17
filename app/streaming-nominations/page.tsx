@@ -2,13 +2,24 @@ import { MonitorPlay } from "lucide-react"
 import { NominationForm } from "@/components/podscars/nomination-form"
 import { getAdminSettings } from "@/lib/podscars-admin"
 import { streamingNominationCategories } from "@/lib/podscars-data"
-import { NOMINATIONS_START_MESSAGE, nominationsHaveStarted } from "@/lib/podscars-nominations"
+import {
+  NOMINATIONS_CLOSED_MESSAGE,
+  NOMINATIONS_DEADLINE_LABEL,
+  NOMINATIONS_START_MESSAGE,
+  nominationsHaveClosed,
+  nominationsHaveStarted,
+} from "@/lib/podscars-nominations"
 
 export default async function StreamingNominationsPage() {
   const settings = await getAdminSettings()
   const nominationsStarted = nominationsHaveStarted()
-  const nominationsOpen = settings.nominationsOpen && nominationsStarted
-  const closedMessage = nominationsStarted ? settings.nominationsMessage : NOMINATIONS_START_MESSAGE
+  const nominationsClosed = nominationsHaveClosed()
+  const nominationsOpen = settings.nominationsOpen && nominationsStarted && !nominationsClosed
+  const closedMessage = !nominationsStarted
+    ? NOMINATIONS_START_MESSAGE
+    : nominationsClosed
+      ? NOMINATIONS_CLOSED_MESSAGE
+      : settings.nominationsMessage
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#eef6ff_0%,#ffffff_30%,#f8fafc_100%)]">
@@ -22,7 +33,8 @@ export default async function StreamingNominationsPage() {
             Nominate standout streamers.
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-            Submit streaming creators, live shows, channels, and streaming-first series for review.
+            Submit streaming creators, live shows, channels, and streaming-first series for review. Nominations close{" "}
+            {NOMINATIONS_DEADLINE_LABEL}.
           </p>
         </div>
       </section>

@@ -2,7 +2,12 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { getAdminSettings } from "@/lib/podscars-admin"
 import { getPodscarsLiveData } from "@/lib/podscars-live"
-import { NOMINATIONS_START_MESSAGE, nominationsHaveStarted } from "@/lib/podscars-nominations"
+import {
+  NOMINATIONS_CLOSED_MESSAGE,
+  NOMINATIONS_START_MESSAGE,
+  nominationsHaveClosed,
+  nominationsHaveStarted,
+} from "@/lib/podscars-nominations"
 import { createSupabaseServerClient } from "@/lib/supabase-server"
 import { getSupabaseAdminClient, isSupabaseConfigured } from "@/lib/supabase"
 
@@ -28,6 +33,10 @@ export async function POST(request: Request) {
 
   if (!nominationsHaveStarted()) {
     return NextResponse.json({ error: NOMINATIONS_START_MESSAGE }, { status: 403 })
+  }
+
+  if (nominationsHaveClosed()) {
+    return NextResponse.json({ error: NOMINATIONS_CLOSED_MESSAGE }, { status: 403 })
   }
 
   if (!isSupabaseConfigured()) {
