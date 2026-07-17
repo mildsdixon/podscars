@@ -11,6 +11,8 @@ import { campaignTimeline } from "@/lib/podscars-data"
 import { getPodscarsLiveData, type PodscarsLiveData } from "@/lib/podscars-live"
 import { isSupabaseConfigured } from "@/lib/supabase"
 
+export const dynamic = "force-dynamic"
+
 export default async function HomePage() {
   const [{ categories }, adSpots, settings] = await Promise.all([getPodscarsContent(), getAdSpots(), getAdminSettings()])
   const liveData: PodscarsLiveData = isSupabaseConfigured()
