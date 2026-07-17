@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { AdvertisingCarousel } from "@/components/podscars/advertising-carousel"
 import { getAdSpots } from "@/lib/podscars-ads"
+import { getAdminSettings } from "@/lib/podscars-admin"
 import { getPodscarsContent } from "@/lib/podscars-content"
 import { campaignTimeline } from "@/lib/podscars-data"
 import { getPodscarsLiveData, type PodscarsLiveData } from "@/lib/podscars-live"
 import { isSupabaseConfigured } from "@/lib/supabase"
 
 export default async function HomePage() {
-  const [{ categories }, adSpots] = await Promise.all([getPodscarsContent(), getAdSpots()])
+  const [{ categories }, adSpots, settings] = await Promise.all([getPodscarsContent(), getAdSpots(), getAdminSettings()])
   const liveData: PodscarsLiveData = isSupabaseConfigured()
     ? await getPodscarsLiveData()
     : {
@@ -120,9 +121,9 @@ export default async function HomePage() {
       <section className="border-y border-slate-200 bg-slate-950 py-16 text-white">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 md:px-6 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-amber-300">How It Works</p>
-            <h2 className="mt-3 font-serif text-4xl">Simple flow</h2>
-            <p className="mt-4 max-w-xl text-slate-300">Nominate, shortlist, vote, announce.</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-amber-300">{settings.homepageFlowEyebrow}</p>
+            <h2 className="mt-3 font-serif text-4xl">{settings.homepageFlowTitle}</h2>
+            <p className="mt-4 max-w-xl text-slate-300">{settings.homepageFlowSummary}</p>
           </div>
 
           <div className="grid gap-4">

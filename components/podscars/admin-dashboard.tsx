@@ -578,6 +578,49 @@ export function AdminDashboard({
               </div>
             </div>
 
+            <div className="rounded-3xl border border-slate-200 p-5">
+              <div>
+                <p className="font-semibold text-slate-950">Homepage flow copy</p>
+                <p className="text-sm text-slate-500">Edits the public “How It Works” section on the homepage.</p>
+              </div>
+              <div className="mt-4 grid gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="homepage-flow-eyebrow">Eyebrow</Label>
+                  <Input
+                    id="homepage-flow-eyebrow"
+                    value={settings.homepageFlowEyebrow}
+                    onChange={(event) => {
+                      setSettings((current) => ({ ...current, homepageFlowEyebrow: event.target.value }))
+                      setSaveState("idle")
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="homepage-flow-title">Title</Label>
+                  <Input
+                    id="homepage-flow-title"
+                    value={settings.homepageFlowTitle}
+                    onChange={(event) => {
+                      setSettings((current) => ({ ...current, homepageFlowTitle: event.target.value }))
+                      setSaveState("idle")
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="homepage-flow-summary">Summary</Label>
+                  <Textarea
+                    id="homepage-flow-summary"
+                    value={settings.homepageFlowSummary}
+                    onChange={(event) => {
+                      setSettings((current) => ({ ...current, homepageFlowSummary: event.target.value }))
+                      setSaveState("idle")
+                    }}
+                    className="min-h-20"
+                  />
+                </div>
+              </div>
+            </div>
+
             <Button className="w-full bg-slate-950 text-white hover:bg-slate-800" onClick={handleSaveSettings} disabled={saveState === "saving"}>
               {saveState === "saving" ? (
                 <>

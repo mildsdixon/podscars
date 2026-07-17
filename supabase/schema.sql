@@ -67,6 +67,9 @@ create table if not exists public.admin_settings (
   voting_open boolean not null default true,
   nominations_message text not null default 'Nominations are temporarily closed. Please check back soon.',
   voting_message text not null default 'Voting is temporarily closed. Please check back soon.',
+  homepage_flow_eyebrow text not null default 'How It Works',
+  homepage_flow_title text not null default 'Simple flow',
+  homepage_flow_summary text not null default 'Nominate, shortlist, vote, announce.',
   updated_at timestamptz not null default now(),
   constraint admin_settings_singleton check (id = 1)
 );

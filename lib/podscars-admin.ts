@@ -20,6 +20,9 @@ export type AdminSettings = {
   votingOpen: boolean
   nominationsMessage: string
   votingMessage: string
+  homepageFlowEyebrow: string
+  homepageFlowTitle: string
+  homepageFlowSummary: string
 }
 
 export function isAdminConfigured() {
@@ -87,6 +90,9 @@ function mapAdminSettings(row: SupabaseAdminSettingsRow): AdminSettings {
     votingOpen: row.voting_open,
     nominationsMessage: row.nominations_message,
     votingMessage: row.voting_message,
+    homepageFlowEyebrow: row.homepage_flow_eyebrow || DEFAULT_ADMIN_SETTINGS.homepage_flow_eyebrow,
+    homepageFlowTitle: row.homepage_flow_title || DEFAULT_ADMIN_SETTINGS.homepage_flow_title,
+    homepageFlowSummary: row.homepage_flow_summary || DEFAULT_ADMIN_SETTINGS.homepage_flow_summary,
   }
 }
 
@@ -136,6 +142,9 @@ export async function updateAdminSettings(settings: AdminSettings): Promise<Admi
     voting_open: settings.votingOpen,
     nominations_message: settings.nominationsMessage,
     voting_message: settings.votingMessage,
+    homepage_flow_eyebrow: settings.homepageFlowEyebrow,
+    homepage_flow_title: settings.homepageFlowTitle,
+    homepage_flow_summary: settings.homepageFlowSummary,
   }
 
   const { data, error } = await supabase.from("admin_settings").upsert(payload, { onConflict: "id" }).select("*").single()

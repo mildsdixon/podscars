@@ -54,6 +54,9 @@ export type SupabaseAdminSettingsRow = {
   voting_open: boolean
   nominations_message: string
   voting_message: string
+  homepage_flow_eyebrow: string
+  homepage_flow_title: string
+  homepage_flow_summary: string
 }
 
 export type SupabaseAdSpotRow = {
@@ -120,4 +123,7 @@ export const DEFAULT_ADMIN_SETTINGS: SupabaseAdminSettingsRow = {
   voting_open: true,
   nominations_message: "Nominations are temporarily closed. Please check back soon.",
   voting_message: "Voting is temporarily closed. Please check back soon.",
+  homepage_flow_eyebrow: "How It Works",
+  homepage_flow_title: "Simple flow",
+  homepage_flow_summary: "Nominate, shortlist, vote, announce.",
 }

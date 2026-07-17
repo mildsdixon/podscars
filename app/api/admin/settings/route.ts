@@ -9,6 +9,9 @@ const settingsSchema = z.object({
   votingOpen: z.boolean(),
   nominationsMessage: z.string().min(1),
   votingMessage: z.string().min(1),
+  homepageFlowEyebrow: z.string().min(1),
+  homepageFlowTitle: z.string().min(1),
+  homepageFlowSummary: z.string().min(1),
 })
 
 export async function GET() {
