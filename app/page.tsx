@@ -6,35 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AdvertisingCarousel } from "@/components/podscars/advertising-carousel"
 import { getAdSpots } from "@/lib/podscars-ads"
 import { getAdminSettings } from "@/lib/podscars-admin"
-import { getPodscarsContent } from "@/lib/podscars-content"
 import { campaignTimeline } from "@/lib/podscars-data"
-import { getPodscarsLiveData, type PodscarsLiveData } from "@/lib/podscars-live"
-import { isSupabaseConfigured } from "@/lib/supabase"
 
 export const dynamic = "force-dynamic"
 
 export default async function HomePage() {
-  const [{ categories }, adSpots, settings] = await Promise.all([getPodscarsContent(), getAdSpots(), getAdminSettings()])
-  const liveData: PodscarsLiveData = isSupabaseConfigured()
-    ? await getPodscarsLiveData()
-    : {
-        source: "supabase",
-        nominations: [],
-        votes: [],
-        stats: {
-          nominations: 0,
-          votes: 0,
-          uniqueVoters: 0,
-          categoriesWithVotes: 0,
-        },
-        leaderboard: [],
-      }
-  const typeCount = new Set(categories.map((category) => category.type)).size
-  const stats = [
-    { value: String(categories.length), label: "Categories" },
-    { value: String(liveData.stats.nominations), label: "Nominations" },
-    { value: String(liveData.stats.uniqueVoters), label: "Voters" },
-  ]
+  const [adSpots, settings] = await Promise.all([getAdSpots(), getAdminSettings()])
   const heroAdSpot = adSpots.find((spot) => spot.active)
 
   return (
@@ -71,20 +48,6 @@ export default async function HomePage() {
                 </Button>
               </Link>
             </div>
-
-            <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {stats.map((stat) => (
-                <div key={stat.label} className="rounded-3xl border border-slate-200 bg-white/80 p-5 shadow-sm">
-                  <p className="text-3xl font-semibold text-slate-950">{stat.value}</p>
-                  <p className="mt-1 text-sm text-slate-500">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-            <p className="mt-4 text-sm text-slate-500">
-              {isSupabaseConfigured()
-                ? `${typeCount} content types and live submissions are active.`
-                : "Connect the live data settings to turn the site fully live."}
-            </p>
           </div>
 
           <Card className="overflow-hidden border-slate-950 bg-slate-950 text-white shadow-[0_30px_100px_rgba(15,23,42,0.35)]">
