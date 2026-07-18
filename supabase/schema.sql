@@ -70,6 +70,8 @@ create table if not exists public.admin_settings (
   homepage_flow_eyebrow text not null default 'How It Works',
   homepage_flow_title text not null default 'Simple flow',
   homepage_flow_summary text not null default 'Nominate, shortlist, vote, announce.',
+  hero_banner_image_url text not null default '/podscars-social-mockups/podscars-landscape-ad-1200x628.png',
+  hero_banner_alt_text text not null default 'Podscars homepage banner',
   updated_at timestamptz not null default now(),
   constraint admin_settings_singleton check (id = 1)
 );

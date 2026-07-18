@@ -23,6 +23,8 @@ export type AdminSettings = {
   homepageFlowEyebrow: string
   homepageFlowTitle: string
   homepageFlowSummary: string
+  heroBannerImageUrl: string
+  heroBannerAltText: string
 }
 
 export function isAdminConfigured() {
@@ -93,6 +95,8 @@ function mapAdminSettings(row: SupabaseAdminSettingsRow): AdminSettings {
     homepageFlowEyebrow: row.homepage_flow_eyebrow || DEFAULT_ADMIN_SETTINGS.homepage_flow_eyebrow,
     homepageFlowTitle: row.homepage_flow_title || DEFAULT_ADMIN_SETTINGS.homepage_flow_title,
     homepageFlowSummary: row.homepage_flow_summary || DEFAULT_ADMIN_SETTINGS.homepage_flow_summary,
+    heroBannerImageUrl: row.hero_banner_image_url || DEFAULT_ADMIN_SETTINGS.hero_banner_image_url,
+    heroBannerAltText: row.hero_banner_alt_text || DEFAULT_ADMIN_SETTINGS.hero_banner_alt_text,
   }
 }
 
@@ -145,6 +149,8 @@ export async function updateAdminSettings(settings: AdminSettings): Promise<Admi
     homepage_flow_eyebrow: settings.homepageFlowEyebrow,
     homepage_flow_title: settings.homepageFlowTitle,
     homepage_flow_summary: settings.homepageFlowSummary,
+    hero_banner_image_url: settings.heroBannerImageUrl,
+    hero_banner_alt_text: settings.heroBannerAltText,
   }
 
   const { data, error } = await supabase.from("admin_settings").upsert(payload, { onConflict: "id" }).select("*").single()

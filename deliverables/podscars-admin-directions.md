@@ -21,12 +21,19 @@ From the admin dashboard, you can:
 - Update award categories.
 - Edit homepage “How It Works” text.
 - Open or close public nomination access.
+- Upload the homepage banner image.
 - Upload the five homepage advertising slideshow images.
 - View live submission totals.
 
 ## Advertising Images
 
-Homepage ad images should be:
+Homepage banner image should be:
+
+- 717 x 223 pixels
+- JPG or PNG
+- This appears under the homepage intro copy
+
+Homepage slideshow ad images should be:
 
 - 1200 x 628 pixels
 - JPG or PNG
@@ -36,10 +43,10 @@ Homepage ad images should be:
 To add or replace ads:
 
 1. Go to the admin dashboard.
-2. Find the advertising/ad spots section.
-3. Upload a JPG or PNG image for each spot.
+2. Find the Advertising section.
+3. Upload a JPG or PNG for the Homepage banner, or upload one image for each slideshow ad spot.
 4. Save the changes.
-5. Refresh the homepage to confirm the slideshow updated.
+5. Refresh the homepage to confirm the banner or slideshow updated.
 
 ## Public Pages
 

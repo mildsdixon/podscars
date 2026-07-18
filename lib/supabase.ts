@@ -57,6 +57,8 @@ export type SupabaseAdminSettingsRow = {
   homepage_flow_eyebrow: string
   homepage_flow_title: string
   homepage_flow_summary: string
+  hero_banner_image_url: string
+  hero_banner_alt_text: string
 }
 
 export type SupabaseAdSpotRow = {
@@ -126,4 +128,6 @@ export const DEFAULT_ADMIN_SETTINGS: SupabaseAdminSettingsRow = {
   homepage_flow_eyebrow: "How It Works",
   homepage_flow_title: "Simple flow",
   homepage_flow_summary: "Nominate, shortlist, vote, announce.",
+  hero_banner_image_url: "/podscars-social-mockups/podscars-landscape-ad-1200x628.png",
+  hero_banner_alt_text: "Podscars homepage banner",
 }

@@ -56,6 +56,7 @@ export function AdminDashboard({
   const [categorySaveState, setCategorySaveState] = useState<"idle" | "saving" | "saved" | "preview">("idle")
   const [adSaveState, setAdSaveState] = useState<"idle" | "saving" | "saved">("idle")
   const [uploadingAdId, setUploadingAdId] = useState<number | null>(null)
+  const [bannerUploadState, setBannerUploadState] = useState<"idle" | "uploading" | "saved">("idle")
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle")
   const [error, setError] = useState("")
   const [pendingStatusId, setPendingStatusId] = useState<string | null>(null)
@@ -247,6 +248,41 @@ export function AdminDashboard({
     }
   }
 
+  async function handleHeroBannerUpload(file: File | undefined) {
+    if (!file) {
+      return
+    }
+
+    setBannerUploadState("uploading")
+    setSaveState("idle")
+    setError("")
+
+    try {
+      const formData = new FormData()
+      formData.append("file", file)
+
+      const response = await fetch("/api/admin/hero-banner/upload", {
+        method: "POST",
+        body: formData,
+      })
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.error || "Could not upload homepage banner.")
+        setBannerUploadState("idle")
+        return
+      }
+
+      setSettings(data.settings)
+      setBannerUploadState("saved")
+      setSaveState("saved")
+    } catch (uploadError) {
+      console.error(uploadError)
+      setError("Could not upload homepage banner.")
+      setBannerUploadState("idle")
+    }
+  }
+
   return (
     <div className="space-y-6">
       <section className="grid gap-4 md:grid-cols-3">
@@ -281,6 +317,72 @@ export function AdminDashboard({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
+          <div className="grid gap-5 rounded-3xl border border-slate-200 p-5 lg:grid-cols-[minmax(0,717px)_1fr]">
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
+              <img
+                src={settings.heroBannerImageUrl}
+                alt={settings.heroBannerAltText}
+                className="aspect-[717/223] w-full object-cover"
+                onError={(event) => {
+                  event.currentTarget.src = "/placeholder.jpg"
+                }}
+              />
+            </div>
+            <div className="space-y-4">
+              <div>
+                <p className="font-semibold text-slate-950">Homepage banner</p>
+                <p className="text-sm text-slate-500">Appears under the homepage intro copy. Best size: 717 x 223.</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="hero-banner-file">Upload JPG/PNG</Label>
+                <Input
+                  id="hero-banner-file"
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,.jpg,.jpeg,.png"
+                  disabled={bannerUploadState === "uploading"}
+                  onChange={(event) => {
+                    void handleHeroBannerUpload(event.target.files?.[0])
+                    event.target.value = ""
+                  }}
+                />
+                {bannerUploadState === "uploading" ? (
+                  <p className="flex items-center text-sm text-slate-500">
+                    <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                    Uploading banner
+                  </p>
+                ) : bannerUploadState === "saved" ? (
+                  <p className="text-sm font-medium text-emerald-700">Banner saved</p>
+                ) : null}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="hero-banner-url">Image URL</Label>
+                <Input
+                  id="hero-banner-url"
+                  value={settings.heroBannerImageUrl}
+                  onChange={(event) => {
+                    setSettings((current) => ({ ...current, heroBannerImageUrl: event.target.value }))
+                    setSaveState("idle")
+                    setBannerUploadState("idle")
+                  }}
+                  placeholder="/path-or-https-url.png"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="hero-banner-alt">Alt text</Label>
+                <Input
+                  id="hero-banner-alt"
+                  value={settings.heroBannerAltText}
+                  onChange={(event) => {
+                    setSettings((current) => ({ ...current, heroBannerAltText: event.target.value }))
+                    setSaveState("idle")
+                    setBannerUploadState("idle")
+                  }}
+                  placeholder="Sponsor banner description"
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="grid gap-4 xl:grid-cols-5">
             {adSpotItems.map((spot, index) => (
               <div key={spot.id} className="space-y-4 rounded-3xl border border-slate-200 p-4">

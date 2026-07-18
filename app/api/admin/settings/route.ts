@@ -12,6 +12,8 @@ const settingsSchema = z.object({
   homepageFlowEyebrow: z.string().min(1),
   homepageFlowTitle: z.string().min(1),
   homepageFlowSummary: z.string().min(1),
+  heroBannerImageUrl: z.string().trim().min(1),
+  heroBannerAltText: z.string().trim().min(1),
 })
 
 export async function GET() {
