@@ -33,7 +33,7 @@ export default async function StreamingNominationsPage() {
             Nominate standout streamers.
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-            Submit streaming creators, live shows, channels, and streaming-first series for review. Nominations close{" "}
+            Submit movie streaming creators, producers, actors, writers, directors, and more for review. Nominations close{" "}
             {NOMINATIONS_DEADLINE_LABEL}.
           </p>
         </div>

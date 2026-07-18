@@ -27,10 +27,6 @@ export function Footer() {
               <Mic2 className="h-4 w-4" />
               Nomination form
             </Link>
-            <Link href="/planning" className="flex items-center gap-2 hover:text-slate-950">
-              <Trophy className="h-4 w-4" />
-              Organizer planning
-            </Link>
           </div>
         </div>
 

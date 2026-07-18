@@ -1,5 +1,8 @@
+import { redirect } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { isAdminAuthenticated } from "@/lib/podscars-admin"
+import { getPodscarsAuthContext } from "@/lib/podscars-auth"
 import { getPodscarsContent } from "@/lib/podscars-content"
 import { getPodscarsLiveData, type PodscarsLiveData } from "@/lib/podscars-live"
 import { campaignTimeline, organizerChecklist } from "@/lib/podscars-data"
@@ -17,6 +20,24 @@ function formatTimestamp(value: string | null) {
 }
 
 export default async function PlanningPage() {
+  if (isSupabaseConfigured()) {
+    const auth = await getPodscarsAuthContext()
+
+    if (!auth.user) {
+      redirect("/admin/login")
+    }
+
+    if (!auth.profile?.is_admin) {
+      redirect("/admin")
+    }
+  } else {
+    const authenticated = await isAdminAuthenticated()
+
+    if (!authenticated) {
+      redirect("/admin/login")
+    }
+  }
+
   const { categories, source } = await getPodscarsContent()
   const liveData: PodscarsLiveData = isSupabaseConfigured()
     ? await getPodscarsLiveData()

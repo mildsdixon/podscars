@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
-import { LogIn, Menu, Mic2, MonitorPlay, Trophy } from "lucide-react"
+import { Menu, Mic2, MonitorPlay, Trophy } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
@@ -11,13 +11,9 @@ const navItems = [
   { href: "/", label: "Overview", icon: Trophy },
   { href: "/nominate", label: "Podcast Nominations", icon: Mic2 },
   { href: "/streaming-nominations", label: "Streaming Nominations", icon: MonitorPlay },
-  { href: "/planning", label: "Planning", icon: Trophy },
 ]
 
-const mobileNavItems = [
-  ...navItems,
-  { href: "/login", label: "User Login", icon: LogIn },
-]
+const mobileNavItems = [...navItems]
 
 export function Navigation() {
   const pathname = usePathname()
@@ -57,19 +53,6 @@ export function Navigation() {
           })}
         </div>
 
-        <div className="hidden shrink-0 items-center gap-2 2xl:flex">
-          <Link href="/login">
-            <Button size="sm" variant="ghost" className="text-slate-700 hover:bg-slate-100 hover:text-slate-950">
-              User login
-            </Button>
-          </Link>
-          <Link href="/nominate">
-            <Button size="sm" className="bg-[hsl(355,78%,54%)] text-white hover:bg-[hsl(355,78%,48%)]">
-              Open nominations
-            </Button>
-          </Link>
-        </div>
-
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild className="lg:hidden">
             <Button variant="ghost" size="icon">
@@ -98,13 +81,7 @@ export function Navigation() {
                 )
               })}
 
-              <div className="space-y-2 pt-6">
-                <Link href="/nominate" onClick={() => setIsOpen(false)}>
-                  <Button className="w-full bg-[hsl(355,78%,54%)] text-white hover:bg-[hsl(355,78%,48%)]">
-                    Open nominations
-                  </Button>
-                </Link>
-              </div>
+              <div className="pt-6" />
             </div>
           </SheetContent>
         </Sheet>

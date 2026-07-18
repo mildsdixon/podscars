@@ -35,6 +35,7 @@ export default async function HomePage() {
     { value: String(liveData.stats.nominations), label: "Nominations" },
     { value: String(liveData.stats.uniqueVoters), label: "Voters" },
   ]
+  const heroAdSpot = adSpots.find((spot) => spot.active)
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#fff8ef_0%,#ffffff_35%,#f8fafc_100%)]">
@@ -51,6 +52,17 @@ export default async function HomePage() {
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600 md:text-xl">
               A live awards site with editable categories, fan voting, and persisted submissions.
             </p>
+            {heroAdSpot ? (
+              <div className="mt-7 w-full max-w-[717px] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+                <div className="aspect-[717/223] w-full bg-slate-100">
+                  <img
+                    src={heroAdSpot.imageUrl}
+                    alt={heroAdSpot.altText}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              </div>
+            ) : null}
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/nominate">
                 <Button size="lg" className="w-full bg-[hsl(355,78%,54%)] px-7 text-white hover:bg-[hsl(355,78%,48%)] sm:w-auto">
