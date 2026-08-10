@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight, Trophy } from "lucide-react"
+import { ArrowRight, Ticket, Trophy } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -42,6 +42,16 @@ export default async function HomePage() {
                 <Button size="lg" className="w-full bg-[hsl(355,78%,54%)] px-7 text-white hover:bg-[hsl(355,78%,48%)] sm:w-auto">
                   Start nominations
                   <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/tickets">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full border-slate-950 bg-white px-7 text-slate-950 hover:bg-slate-100 sm:w-auto"
+                >
+                  Buy Tickets Now
+                  <Ticket className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
             </div>

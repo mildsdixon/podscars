@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
-import { Menu, Mic2, MonitorPlay, Trophy } from "lucide-react"
+import { Menu, Mic2, MonitorPlay, Ticket, Trophy } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
@@ -13,7 +13,8 @@ const navItems = [
   { href: "/streaming-nominations", label: "Streaming Nominations", icon: MonitorPlay },
 ]
 
-const mobileNavItems = [...navItems]
+const ticketItem = { href: "/tickets", label: "Buy Tickets Now", icon: Ticket }
+const mobileNavItems = [...navItems, ticketItem]
 
 export function Navigation() {
   const pathname = usePathname()
@@ -52,6 +53,13 @@ export function Navigation() {
             )
           })}
         </div>
+
+        <Link href={ticketItem.href} className="hidden shrink-0 lg:block">
+          <Button className="bg-[hsl(355,78%,54%)] px-5 text-white hover:bg-[hsl(355,78%,48%)]">
+            <Ticket className="h-4 w-4" />
+            Buy Tickets Now
+          </Button>
+        </Link>
 
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild className="lg:hidden">
