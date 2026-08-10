@@ -3,6 +3,7 @@ import { ArrowRight, CalendarDays, Ticket } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { PODSCARS_TICKET_URL } from "@/lib/podscars-tickets"
 
 export const dynamic = "force-dynamic"
 
@@ -16,8 +17,16 @@ export default function TicketsPage() {
             Buy tickets for the Podscars.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600 md:text-xl">
-            Ticket checkout is being connected. Please check back here for the official purchase link.
+            Get your official tickets for the 4th Annual Podscar Awards through Eventbrite.
           </p>
+          <div className="mt-8">
+            <Link href={PODSCARS_TICKET_URL} target="_blank" rel="noopener noreferrer">
+              <Button size="lg" className="bg-[hsl(355,78%,54%)] px-7 text-white hover:bg-[hsl(355,78%,48%)]">
+                Buy Tickets Now
+                <Ticket className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -29,8 +38,7 @@ export default function TicketsPage() {
             </div>
             <h2 className="font-serif text-3xl text-slate-950">Ticket sales are almost ready.</h2>
             <p className="mt-4 leading-7 text-slate-600">
-              This page is ready for the final ticket checkout link. Once the purchase URL is added, the Buy Tickets Now
-              buttons will send guests straight to checkout.
+              Ticket checkout is live now. Use the official Eventbrite link to reserve seats for the awards.
             </p>
           </CardContent>
         </Card>

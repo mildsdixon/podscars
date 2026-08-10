@@ -6,6 +6,7 @@ import { useState } from "react"
 import { Menu, Mic2, MonitorPlay, Ticket, Trophy } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { PODSCARS_TICKET_URL } from "@/lib/podscars-tickets"
 
 const navItems = [
   { href: "/", label: "Overview", icon: Trophy },
@@ -13,7 +14,7 @@ const navItems = [
   { href: "/streaming-nominations", label: "Streaming Nominations", icon: MonitorPlay },
 ]
 
-const ticketItem = { href: "/tickets", label: "Buy Tickets Now", icon: Ticket }
+const ticketItem = { href: PODSCARS_TICKET_URL, label: "Buy Tickets Now", icon: Ticket }
 const mobileNavItems = [...navItems, ticketItem]
 
 export function Navigation() {
@@ -54,7 +55,7 @@ export function Navigation() {
           })}
         </div>
 
-        <Link href={ticketItem.href} className="hidden shrink-0 lg:block">
+        <Link href={ticketItem.href} target="_blank" rel="noopener noreferrer" className="hidden shrink-0 lg:block">
           <Button className="bg-[hsl(355,78%,54%)] px-5 text-white hover:bg-[hsl(355,78%,48%)]">
             <Ticket className="h-4 w-4" />
             Buy Tickets Now
@@ -78,6 +79,8 @@ export function Navigation() {
                   <Link
                     key={item.href}
                     href={item.href}
+                    target={item.href.startsWith("http") ? "_blank" : undefined}
+                    rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
                     onClick={() => setIsOpen(false)}
                     className={`flex items-center gap-3 text-lg font-medium ${
                       active ? "text-rose-600" : "text-slate-700"

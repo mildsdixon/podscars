@@ -7,6 +7,7 @@ import { AdvertisingCarousel } from "@/components/podscars/advertising-carousel"
 import { getAdSpots } from "@/lib/podscars-ads"
 import { getAdminSettings } from "@/lib/podscars-admin"
 import { campaignTimeline } from "@/lib/podscars-data"
+import { PODSCARS_TICKET_URL } from "@/lib/podscars-tickets"
 
 export const dynamic = "force-dynamic"
 
@@ -44,7 +45,7 @@ export default async function HomePage() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/tickets">
+              <Link href={PODSCARS_TICKET_URL} target="_blank" rel="noopener noreferrer">
                 <Button
                   size="lg"
                   variant="outline"
