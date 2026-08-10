@@ -43,12 +43,6 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-slate-200">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 text-sm text-slate-500 md:px-6">
-          <p>Podscars platform concept</p>
-          <p>Built in Next.js for rapid launch</p>
-        </div>
-      </div>
     </footer>
   )
 }
