@@ -6,6 +6,7 @@ import {
   NOMINATIONS_CLOSED_MESSAGE,
   NOMINATIONS_DEADLINE_LABEL,
   NOMINATIONS_START_MESSAGE,
+  VOTING_START_DATE_LABEL,
   nominationsHaveClosed,
   nominationsHaveStarted,
 } from "@/lib/podscars-nominations"
@@ -33,8 +34,8 @@ export default async function StreamingNominationsPage() {
             Nominate standout streamers.
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-            Submit movie streaming creators, producers, actors, writers, directors, and more for review. Nominations close{" "}
-            {NOMINATIONS_DEADLINE_LABEL}.
+            Submit movie streaming creators, producers, actors, writers, directors, and more for review. Nominations
+            stop {NOMINATIONS_DEADLINE_LABEL}. Voting starts {VOTING_START_DATE_LABEL}.
           </p>
         </div>
       </section>

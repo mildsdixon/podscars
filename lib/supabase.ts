@@ -124,7 +124,7 @@ export const DEFAULT_ADMIN_SETTINGS: SupabaseAdminSettingsRow = {
   nominations_open: true,
   voting_open: true,
   nominations_message: "Nominations are temporarily closed. Please check back soon.",
-  voting_message: "Voting is temporarily closed. Please check back soon.",
+  voting_message: "Voting starts Wednesday, August 26, 2026. Please check back then.",
   homepage_flow_eyebrow: "How It Works",
   homepage_flow_title: "Simple flow",
   homepage_flow_summary: "Nominate, shortlist, vote, announce.",

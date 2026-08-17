@@ -3,6 +3,7 @@ import { ArrowRight, CalendarDays, Ticket } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { NOMINATIONS_DEADLINE_LABEL, VOTING_START_DATE_LABEL } from "@/lib/podscars-nominations"
 import { PODSCARS_TICKET_URL } from "@/lib/podscars-tickets"
 
 export const dynamic = "force-dynamic"
@@ -50,8 +51,8 @@ export default function TicketsPage() {
             </div>
             <h2 className="font-serif text-3xl">Stay close to the awards.</h2>
             <p className="mt-4 leading-7 text-slate-300">
-              Nominations are open until August 17, 2026. Submit your podcast or streaming nomination while ticket sales
-              are being finalized.
+              Nominations stop {NOMINATIONS_DEADLINE_LABEL}. Voting starts {VOTING_START_DATE_LABEL}. Submit your
+              podcast or streaming nomination before the cutoff.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Link href="/nominate">

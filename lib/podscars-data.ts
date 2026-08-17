@@ -277,8 +277,8 @@ export const streamingNominationCategories: PodscarsCategory[] = [
 export const campaignTimeline = [
   {
     phase: "Nominations Open",
-    window: "Week 1-3",
-    description: "Fans submit people, podcasts, and movie picks across every category.",
+    window: "Through Aug 25, 9 PM ET",
+    description: "Fans submit people, podcasts, and movie picks before nominations stop.",
   },
   {
     phase: "Review + Finalists",
@@ -287,7 +287,7 @@ export const campaignTimeline = [
   },
   {
     phase: "Public Voting",
-    window: "Week 5-6",
+    window: "Starts Aug 26",
     description: "Fans vote once per category and share their ballot to drive reach.",
   },
   {
