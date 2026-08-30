@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { ImageIcon, LoaderCircle, Save, Settings2, ShieldCheck } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
+import { ImageIcon, LoaderCircle, RefreshCw, Save, Settings2, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,11 +13,13 @@ import { SignOutButton } from "@/components/podscars/sign-out-button"
 import type { AdSpot } from "@/lib/podscars-ads"
 import type { AdminSettings } from "@/lib/podscars-admin"
 import type { PodscarsCategory, PodscarsFinalistGroup } from "@/lib/podscars-data"
-import type { LiveNomination, PodscarsLiveData } from "@/lib/podscars-live"
+import type { LiveNomination, LiveVote, PodscarsLiveData, VoteLeaderboardEntry } from "@/lib/podscars-live"
 
 type AdminDashboardProps = {
   initialSettings: AdminSettings
   nominations: LiveNomination[]
+  votes: LiveVote[]
+  leaderboard: VoteLeaderboardEntry[]
   categories: PodscarsCategory[]
   finalists: PodscarsFinalistGroup[]
   contentSource: "fallback" | "supabase"
@@ -96,9 +98,24 @@ function parseFinalistText(text: string, categories: PodscarsCategory[]) {
     .map(([categoryId, nominees]) => ({ categoryId, nominees }))
 }
 
+function formatVoteTime(value: string | null) {
+  if (!value) {
+    return "Time not recorded"
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value))
+}
+
 export function AdminDashboard({
   initialSettings,
   nominations,
+  votes,
+  leaderboard,
   categories,
   finalists,
   contentSource,
@@ -109,6 +126,9 @@ export function AdminDashboard({
 }: AdminDashboardProps) {
   const [settings, setSettings] = useState(initialSettings)
   const [nominationItems, setNominationItems] = useState(nominations)
+  const [voteItems, setVoteItems] = useState(votes)
+  const [voteStats, setVoteStats] = useState(stats)
+  const [voteLeaders, setVoteLeaders] = useState(leaderboard)
   const [categoryItems, setCategoryItems] = useState(categories)
   const [adSpotItems, setAdSpotItems] = useState(initialAdSpots)
   const [finalistText, setFinalistText] = useState(() => finalistGroupsToText(categories, finalists))
@@ -124,8 +144,52 @@ export function AdminDashboard({
   const [uploadingAdId, setUploadingAdId] = useState<number | null>(null)
   const [bannerUploadState, setBannerUploadState] = useState<"idle" | "uploading" | "saved">("idle")
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle")
+  const [voteRefreshState, setVoteRefreshState] = useState<"idle" | "refreshing">("idle")
+  const [lastVoteRefresh, setLastVoteRefresh] = useState(() => new Date())
   const [error, setError] = useState("")
   const [pendingStatusId, setPendingStatusId] = useState<string | null>(null)
+  const recentVotes = useMemo(() => voteItems.slice(0, 12), [voteItems])
+  const topVoteLeaders = useMemo(() => voteLeaders.slice(0, 8), [voteLeaders])
+
+  async function refreshVotes(silent = false) {
+    if (!silent) {
+      setVoteRefreshState("refreshing")
+    }
+
+    try {
+      const response = await fetch("/api/admin/votes", { cache: "no-store" })
+      const data = await response.json()
+
+      if (!response.ok) {
+        if (!silent) {
+          setError(data.error || "Could not refresh live votes.")
+        }
+        return
+      }
+
+      setVoteItems(data.votes || [])
+      setVoteStats(data.stats || voteStats)
+      setVoteLeaders(data.leaderboard || [])
+      setLastVoteRefresh(new Date())
+    } catch (refreshError) {
+      console.error(refreshError)
+      if (!silent) {
+        setError("Could not refresh live votes.")
+      }
+    } finally {
+      if (!silent) {
+        setVoteRefreshState("idle")
+      }
+    }
+  }
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      void refreshVotes(true)
+    }, 15000)
+
+    return () => window.clearInterval(interval)
+  }, [])
 
   async function handleSaveSettings() {
     setSaveState("saving")
@@ -403,16 +467,93 @@ export function AdminDashboard({
         <Card className="bg-white">
           <CardHeader className="pb-2">
             <CardDescription>Votes</CardDescription>
-            <CardTitle className="text-3xl">{stats.votes}</CardTitle>
+            <CardTitle className="text-3xl">{voteStats.votes}</CardTitle>
           </CardHeader>
         </Card>
         <Card className="bg-white">
           <CardHeader className="pb-2">
             <CardDescription>Unique voters</CardDescription>
-            <CardTitle className="text-3xl">{stats.uniqueVoters}</CardTitle>
+            <CardTitle className="text-3xl">{voteStats.uniqueVoters}</CardTitle>
           </CardHeader>
         </Card>
       </section>
+
+      <Card className="bg-white">
+        <CardHeader className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div>
+            <CardTitle className="text-3xl text-slate-950">Live vote tracker</CardTitle>
+            <CardDescription className="text-base text-slate-600">
+              Auto-refreshes every 15 seconds so you can watch ballots come in.
+            </CardDescription>
+            <p className="mt-2 text-sm text-slate-500">Last checked {formatVoteTime(lastVoteRefresh.toISOString())}</p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => void refreshVotes()}
+            disabled={voteRefreshState === "refreshing"}
+            className="shrink-0"
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${voteRefreshState === "refreshing" ? "animate-spin" : ""}`} />
+            Refresh votes
+          </Button>
+        </CardHeader>
+        <CardContent className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-semibold text-slate-950">Recent votes</p>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                {voteStats.votes} total
+              </span>
+            </div>
+            {!recentVotes.length ? (
+              <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-slate-600">
+                No votes have been submitted yet.
+              </div>
+            ) : null}
+            {recentVotes.map((vote) => (
+              <div key={vote.id} className="rounded-2xl border border-slate-200 p-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p className="font-semibold text-slate-950">{vote.nomineeName}</p>
+                    <p className="mt-1 text-sm text-slate-600">{vote.categoryTitle}</p>
+                  </div>
+                  <p className="text-sm text-slate-500">{formatVoteTime(vote.submittedAt)}</p>
+                </div>
+                <p className="mt-3 text-sm text-slate-500">
+                  {vote.voterName} / {vote.voterEmail}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-semibold text-slate-950">Top vote-getters</p>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                {voteStats.categoriesWithVotes} categories
+              </span>
+            </div>
+            {!topVoteLeaders.length ? (
+              <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-slate-600">
+                Leaderboard will appear after votes are submitted.
+              </div>
+            ) : null}
+            {topVoteLeaders.map((leader) => (
+              <div key={`${leader.categoryId}-${leader.nomineeName}`} className="rounded-2xl border border-slate-200 p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="font-semibold text-slate-950">{leader.nomineeName}</p>
+                    <p className="mt-1 text-sm text-slate-600">{leader.categoryTitle}</p>
+                  </div>
+                  <span className="rounded-full bg-[#c90000] px-3 py-1 text-sm font-bold text-white">
+                    {leader.votes}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="bg-white">
         <CardHeader>

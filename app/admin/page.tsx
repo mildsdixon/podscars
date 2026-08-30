@@ -57,6 +57,8 @@ export default async function AdminPage() {
           <AdminDashboard
             initialSettings={settings}
             nominations={liveData.nominations}
+            votes={liveData.votes}
+            leaderboard={liveData.leaderboard}
             categories={content.categories}
             finalists={content.finalists}
             contentSource={content.source}
@@ -112,6 +114,8 @@ export default async function AdminPage() {
         <AdminDashboard
           initialSettings={settings}
           nominations={liveData.nominations}
+          votes={liveData.votes}
+          leaderboard={liveData.leaderboard}
           categories={content.categories}
           finalists={content.finalists}
           contentSource={content.source}
