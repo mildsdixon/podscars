@@ -1,11 +1,9 @@
 import Link from "next/link"
-import { CalendarDays, Star, Ticket, Vote } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
+import { Star, Ticket, Vote } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AdvertisingCarousel } from "@/components/podscars/advertising-carousel"
 import { getAdSpots } from "@/lib/podscars-ads"
 import { getAdminSettings } from "@/lib/podscars-admin"
-import { campaignTimeline } from "@/lib/podscars-data"
 import { PODSCARS_TICKET_URL } from "@/lib/podscars-tickets"
 
 export const dynamic = "force-dynamic"
@@ -73,31 +71,6 @@ export default async function HomePage() {
       </section>
 
       <AdvertisingCarousel spots={adSpots} />
-
-      <section className="border-y border-amber-200 bg-[linear-gradient(180deg,#ffffff_0%,#fff8eb_100%)] py-16 text-slate-950">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 md:px-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <div>
-            <p className="text-sm font-extrabold uppercase tracking-[0.25em] text-[#a06d12]">{settings.homepageFlowEyebrow}</p>
-            <h2 className="mt-3 font-serif text-4xl">{settings.homepageFlowTitle}</h2>
-            <p className="mt-4 max-w-xl text-slate-600">{settings.homepageFlowSummary}</p>
-          </div>
-
-          <div className="grid gap-4">
-            {campaignTimeline.map((item) => (
-              <div key={item.phase} className="rounded border border-amber-200 bg-white p-5 shadow-[0_14px_34px_rgba(160,109,18,0.08)]">
-                <div className="flex items-center justify-between gap-4">
-                  <p className="text-xl font-semibold">{item.phase}</p>
-                  <Badge className="bg-slate-950 text-white hover:bg-slate-950">
-                    <CalendarDays className="mr-1.5 h-3.5 w-3.5" />
-                    {item.window}
-                  </Badge>
-                </div>
-                <p className="mt-2 text-slate-600">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
     </div>
   )
 }
