@@ -56,6 +56,8 @@ export default async function AdminPage() {
         <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
           <AdminDashboard
             initialSettings={settings}
+            votes={liveData.votes}
+            leaderboard={liveData.leaderboard}
             categories={content.categories}
             finalists={content.finalists}
             contentSource={content.source}
@@ -109,6 +111,8 @@ export default async function AdminPage() {
       <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
         <AdminDashboard
           initialSettings={settings}
+          votes={liveData.votes}
+          leaderboard={liveData.leaderboard}
           categories={content.categories}
           finalists={content.finalists}
           contentSource={content.source}

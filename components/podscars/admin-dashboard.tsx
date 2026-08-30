@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { ImageIcon, LoaderCircle, Save, Settings2, ShieldCheck } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
+import { ImageIcon, LoaderCircle, RefreshCw, Save, Settings2, ShieldCheck } from "lucide-react"
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,10 +14,12 @@ import { SignOutButton } from "@/components/podscars/sign-out-button"
 import type { AdSpot } from "@/lib/podscars-ads"
 import type { AdminSettings } from "@/lib/podscars-admin"
 import type { PodscarsCategory, PodscarsFinalistGroup } from "@/lib/podscars-data"
-import type { PodscarsLiveData } from "@/lib/podscars-live"
+import type { LiveVote, PodscarsLiveData, VoteLeaderboardEntry } from "@/lib/podscars-live"
 
 type AdminDashboardProps = {
   initialSettings: AdminSettings
+  votes: LiveVote[]
+  leaderboard: VoteLeaderboardEntry[]
   categories: PodscarsCategory[]
   finalists: PodscarsFinalistGroup[]
   contentSource: "fallback" | "supabase"
@@ -93,8 +96,21 @@ function parseFinalistText(text: string, categories: PodscarsCategory[]) {
     .map(([categoryId, nominees]) => ({ categoryId, nominees }))
 }
 
+function shortCategoryTitle(title: string) {
+  return title.replace(/^Streaming - /, "")
+}
+
+function formatRefreshTime(value: Date) {
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(value)
+}
+
 export function AdminDashboard({
   initialSettings,
+  votes,
+  leaderboard,
   categories,
   finalists,
   contentSource,
@@ -104,6 +120,9 @@ export function AdminDashboard({
 }: AdminDashboardProps) {
   const [settings, setSettings] = useState(initialSettings)
   const [categoryItems, setCategoryItems] = useState(categories)
+  const [voteItems, setVoteItems] = useState(votes)
+  const [voteStats, setVoteStats] = useState(stats)
+  const [voteLeaders, setVoteLeaders] = useState(leaderboard)
   const [adSpotItems, setAdSpotItems] = useState(initialAdSpots)
   const [finalistText, setFinalistText] = useState(() => finalistGroupsToText(categories, finalists))
   const [categoryForm, setCategoryForm] = useState({
@@ -118,7 +137,76 @@ export function AdminDashboard({
   const [uploadingAdId, setUploadingAdId] = useState<number | null>(null)
   const [bannerUploadState, setBannerUploadState] = useState<"idle" | "uploading" | "saved">("idle")
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle")
+  const [voteRefreshState, setVoteRefreshState] = useState<"idle" | "refreshing">("idle")
+  const [lastVoteRefresh, setLastVoteRefresh] = useState(() => new Date())
   const [error, setError] = useState("")
+  const categoryVoteChart = useMemo(() => {
+    const grouped = new Map<string, { category: string; fullCategory: string; votes: number }>()
+
+    voteItems.forEach((vote) => {
+      const existing = grouped.get(vote.categoryId)
+
+      if (existing) {
+        existing.votes += 1
+        return
+      }
+
+      grouped.set(vote.categoryId, {
+        category: shortCategoryTitle(vote.categoryTitle),
+        fullCategory: vote.categoryTitle,
+        votes: 1,
+      })
+    })
+
+    return Array.from(grouped.values()).sort((left, right) => {
+      if (right.votes !== left.votes) {
+        return right.votes - left.votes
+      }
+
+      return left.fullCategory.localeCompare(right.fullCategory)
+    })
+  }, [voteItems])
+  const topCategoryLeaders = useMemo(() => voteLeaders.slice(0, 6), [voteLeaders])
+
+  async function refreshVoteChart(silent = false) {
+    if (!silent) {
+      setVoteRefreshState("refreshing")
+    }
+
+    try {
+      const response = await fetch("/api/admin/votes", { cache: "no-store" })
+      const data = await response.json()
+
+      if (!response.ok) {
+        if (!silent) {
+          setError(data.error || "Could not refresh voting chart.")
+        }
+        return
+      }
+
+      setVoteItems(data.votes || [])
+      setVoteStats(data.stats || voteStats)
+      setVoteLeaders(data.leaderboard || [])
+      setLastVoteRefresh(new Date())
+    } catch (refreshError) {
+      console.error(refreshError)
+      if (!silent) {
+        setError("Could not refresh voting chart.")
+      }
+    } finally {
+      if (!silent) {
+        setVoteRefreshState("idle")
+      }
+    }
+  }
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      void refreshVoteChart(true)
+    }, 15000)
+
+    return () => window.clearInterval(interval)
+  }, [])
 
   async function handleSaveSettings() {
     setSaveState("saving")
@@ -359,16 +447,83 @@ export function AdminDashboard({
         <Card className="bg-white">
           <CardHeader className="pb-2">
             <CardDescription>Votes</CardDescription>
-            <CardTitle className="text-3xl">{stats.votes}</CardTitle>
+            <CardTitle className="text-3xl">{voteStats.votes}</CardTitle>
           </CardHeader>
         </Card>
         <Card className="bg-white">
           <CardHeader className="pb-2">
             <CardDescription>Unique voters</CardDescription>
-            <CardTitle className="text-3xl">{stats.uniqueVoters}</CardTitle>
+            <CardTitle className="text-3xl">{voteStats.uniqueVoters}</CardTitle>
           </CardHeader>
         </Card>
       </section>
+
+      <Card className="bg-white">
+        <CardHeader className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div>
+            <CardTitle className="text-3xl text-slate-950">Votes by category</CardTitle>
+            <CardDescription className="text-base text-slate-600">
+              Category totals refresh automatically while voting is open.
+            </CardDescription>
+            <p className="mt-2 text-sm text-slate-500">Last checked {formatRefreshTime(lastVoteRefresh)}</p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => void refreshVoteChart()}
+            disabled={voteRefreshState === "refreshing"}
+            className="shrink-0"
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${voteRefreshState === "refreshing" ? "animate-spin" : ""}`} />
+            Refresh chart
+          </Button>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {!categoryVoteChart.length ? (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-slate-600">
+              No votes have been submitted since the voting reset.
+            </div>
+          ) : (
+            <div className="h-[420px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={categoryVoteChart} layout="vertical" margin={{ top: 8, right: 24, bottom: 8, left: 16 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
+                  <XAxis type="number" allowDecimals={false} tickLine={false} axisLine={false} />
+                  <YAxis
+                    type="category"
+                    dataKey="category"
+                    width={190}
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fontSize: 12, fill: "#334155" }}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "rgba(201,0,0,0.06)" }}
+                    formatter={(value) => [`${value} votes`, "Total"]}
+                    labelFormatter={(_, payload) => payload?.[0]?.payload?.fullCategory || ""}
+                  />
+                  <Bar dataKey="votes" fill="#c90000" radius={[0, 6, 6, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {topCategoryLeaders.map((leader) => (
+              <div key={`${leader.categoryId}-${leader.nomineeName}`} className="rounded-2xl border border-slate-200 p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="font-semibold text-slate-950">{leader.nomineeName}</p>
+                    <p className="mt-1 text-sm text-slate-600">{leader.categoryTitle}</p>
+                  </div>
+                  <span className="rounded-full bg-[#c90000] px-3 py-1 text-sm font-bold text-white">
+                    {leader.votes}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="bg-white">
         <CardHeader>
