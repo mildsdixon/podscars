@@ -516,7 +516,6 @@ export const defaultSampleFinalists: PodscarsFinalistGroup[] = [
       { name: "Talking Ish With My Boyz", subtitle: "" },
       { name: "Girth", subtitle: "" },
       { name: "We Listen and We Judge", subtitle: "" },
-      { name: "Dawgface TV Podcast Unleashed", subtitle: "" },
     ],
   },
   {
