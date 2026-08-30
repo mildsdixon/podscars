@@ -550,7 +550,7 @@ export const defaultSampleFinalists: PodscarsFinalistGroup[] = [
     categoryId: "best-business-podcast",
     nominees: [
       { name: "Black Fridays", subtitle: "" },
-      { name: "Loren Lewis", subtitle: "" },
+      { name: "Detroit City Deals", subtitle: "" },
     ],
   },
   {
