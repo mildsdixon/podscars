@@ -498,6 +498,7 @@ export const defaultSampleFinalists: PodscarsFinalistGroup[] = [
       { name: "What Up Doe Podcast", subtitle: "" },
       { name: "This is What We Do", subtitle: "" },
       { name: "Detroit Table Talk", subtitle: "" },
+      { name: "Podtalk", subtitle: "" },
     ],
   },
   {
