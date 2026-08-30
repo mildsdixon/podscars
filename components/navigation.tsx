@@ -14,7 +14,7 @@ const navItems = [
 ]
 
 const ticketItem = { href: PODSCARS_TICKET_URL, label: "Buy Tickets Now", icon: Ticket }
-const facebookItem = { href: "https://www.facebook.com/ThePodscars", label: "Follow us on Facebook", icon: ExternalLink }
+const facebookItem = { href: "https://www.facebook.com/profile.php?id=100091994472542", label: "Follow us on Facebook", icon: ExternalLink }
 const mobileNavItems = [...navItems, facebookItem, ticketItem]
 
 export function Navigation() {
