@@ -58,6 +58,7 @@ export default async function AdminPage() {
             initialSettings={settings}
             nominations={liveData.nominations}
             categories={content.categories}
+            finalists={content.finalists}
             contentSource={content.source}
             stats={liveData.stats}
             source={liveData.source}
@@ -112,6 +113,7 @@ export default async function AdminPage() {
           initialSettings={settings}
           nominations={liveData.nominations}
           categories={content.categories}
+          finalists={content.finalists}
           contentSource={content.source}
           stats={liveData.stats}
           source={liveData.source}

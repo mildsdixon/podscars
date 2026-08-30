@@ -1,5 +1,6 @@
 import Link from "next/link"
-import { Mail, Mic2, Trophy } from "lucide-react"
+import { Mail, Ticket, Trophy, Vote } from "lucide-react"
+import { PODSCARS_TICKET_URL } from "@/lib/podscars-tickets"
 
 export function Footer() {
   return (
@@ -16,25 +17,34 @@ export function Footer() {
             </div>
           </div>
           <p className="max-w-md text-slate-600">
-            A launch-ready concept for collecting nominations, publishing finalists, and running a public awards ballot.
+            A fan-powered awards experience celebrating podcasters, creators, and film industry talent.
           </p>
         </div>
 
         <div>
-          <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Platform</p>
+          <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Awards</p>
           <div className="space-y-3 text-slate-600">
-            <Link href="/nominate" className="flex items-center gap-2 hover:text-slate-950">
-              <Mic2 className="h-4 w-4" />
-              Nomination form
+            <Link href="/vote" className="flex items-center gap-2 hover:text-slate-950">
+              <Vote className="h-4 w-4" />
+              Vote Now
+            </Link>
+            <Link
+              href={PODSCARS_TICKET_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 hover:text-slate-950"
+            >
+              <Ticket className="h-4 w-4" />
+              Buy Tickets Now
             </Link>
           </div>
         </div>
 
         <div>
-          <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Next Move</p>
+          <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Event</p>
           <div className="space-y-3 text-slate-600">
-            <p>Pick your official awards year and nomination deadline.</p>
-            <p>Keep forms, categories, and ballot content updated.</p>
+            <p>Friday, October 9, 2026.</p>
+            <p>Keep voting, sponsor banners, and event details updated.</p>
             <p className="flex items-center gap-2">
               <Mail className="h-4 w-4" />
               Use a branded inbox for moderation and winner outreach.

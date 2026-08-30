@@ -3,6 +3,10 @@ import { updateSupabaseSession } from "@/lib/supabase-middleware"
 import { isSupabaseConfigured } from "@/lib/supabase"
 
 export async function middleware(request: NextRequest) {
+  if (request.nextUrl.pathname === "/nominate" || request.nextUrl.pathname === "/streaming-nominations") {
+    return NextResponse.redirect(new URL("/vote", request.url))
+  }
+
   if (!isSupabaseConfigured()) {
     return NextResponse.next()
   }

@@ -3,15 +3,14 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
-import { Menu, Mic2, MonitorPlay, Ticket, Trophy } from "lucide-react"
+import { Menu, Ticket, Trophy, Vote } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { PODSCARS_TICKET_URL } from "@/lib/podscars-tickets"
 
 const navItems = [
   { href: "/", label: "Overview", icon: Trophy },
-  { href: "/nominate", label: "Podcast Nominations", icon: Mic2 },
-  { href: "/streaming-nominations", label: "Streaming Nominations", icon: MonitorPlay },
+  { href: "/vote", label: "Vote Now", icon: Vote },
 ]
 
 const ticketItem = { href: PODSCARS_TICKET_URL, label: "Buy Tickets Now", icon: Ticket }

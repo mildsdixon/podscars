@@ -1,13 +1,11 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { CheckCircle2, LoaderCircle, Vote } from "lucide-react"
+import { CheckCircle2, LoaderCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,21 +44,24 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState("")
   const [duplicateVotes, setDuplicateVotes] = useState<DuplicateVote[]>([])
-  const ballotCategories = categories.filter((category) =>
-    finalists.some((finalistGroup) => finalistGroup.categoryId === category.id),
-  )
 
-  const completedCount = Object.keys(ballot).length
-  const completion = ballotCategories.length ? Math.round((completedCount / ballotCategories.length) * 100) : 0
+  const ballotCategories = categories.filter((category) =>
+    finalists.some((finalistGroup) => finalistGroup.categoryId === category.id && finalistGroup.nominees.length),
+  )
+  const completedCount = Object.values(ballot).filter(Boolean).length
+  const canSubmit = Boolean(voterName.trim() && voterEmail.trim() && completedCount > 0 && isOpen)
 
   const selections = useMemo(
     () =>
-      ballotCategories.map((category) => ({
-        category: category.title,
-        nominee: finalists
-          .find((group) => group.categoryId === category.id)
-          ?.nominees.find((nominee) => nominee.name === ballot[category.id])?.name ?? "No vote yet",
-      })),
+      ballotCategories
+        .filter((category) => ballot[category.id])
+        .map((category) => ({
+          id: category.id,
+          category: category.title,
+          nominee: finalists
+            .find((group) => group.categoryId === category.id)
+            ?.nominees.find((nominee) => nominee.name === ballot[category.id])?.name,
+        })),
     [ballot, ballotCategories, finalists],
   )
 
@@ -70,11 +71,13 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
     setError("")
 
     try {
-      const votes = ballotCategories.map((category) => ({
-        categoryId: category.id,
-        categoryTitle: category.title,
-        nomineeName: ballot[category.id],
-      }))
+      const votes = ballotCategories
+        .filter((category) => ballot[category.id])
+        .map((category) => ({
+          categoryId: category.id,
+          categoryTitle: category.title,
+          nomineeName: ballot[category.id],
+        }))
 
       const response = await fetch("/api/votes", {
         method: "POST",
@@ -112,99 +115,26 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-      <div className="space-y-6">
-        <Card className="border-slate-200 bg-white">
-          <CardHeader className="pb-4">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <CardTitle className="text-2xl text-slate-950">Public ballot</CardTitle>
-                <CardDescription className="text-base text-slate-600">
-                  One vote per email, per category, per year. If you already voted in a category, you can keep the old
-                  choice or overwrite it.
-                </CardDescription>
-              </div>
-              <div className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
-                {completedCount}/{ballotCategories.length} voted
-              </div>
-            </div>
-            <Progress value={completion} className="mt-4 h-2" />
-          </CardHeader>
-        </Card>
+    <div className="mx-auto max-w-3xl">
+      <div className="rounded border border-amber-200 bg-white shadow-[0_18px_45px_rgba(160,109,18,0.08)]">
+        <div className="border-b border-amber-200 p-5 sm:p-7">
+          <h2 className="font-serif text-4xl leading-tight text-slate-950">Podscars Voting Ballot</h2>
+          <p className="mt-3 text-base leading-7 text-slate-600">
+            Choose one nominee in any category you want to vote in. You do not have to answer every category.
+          </p>
+          <p className="mt-2 text-sm text-slate-500">
+            If your email already voted in a category, you can keep the old choice or replace it.
+          </p>
+        </div>
 
-        {!ballotCategories.length ? (
-          <Card className="border-dashed border-slate-300 bg-slate-50">
-            <CardContent className="p-8">
-              <p className="text-lg font-semibold text-slate-950">No finalists published yet</p>
-              <p className="mt-2 text-slate-600">
-                Add finalists in the admin backend and this ballot will populate automatically.
-              </p>
-            </CardContent>
-          </Card>
-        ) : null}
-
-        {ballotCategories.map((category) => {
-          const finalistGroup = finalists.find((group) => group.categoryId === category.id)
-
-          if (!finalistGroup) {
-            return null
-          }
-
-          return (
-            <Card key={category.id} className="border-slate-200 bg-white shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-xl text-slate-950">{category.title}</CardTitle>
-                <CardDescription>{category.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <RadioGroup
-                  value={ballot[category.id]}
-                  onValueChange={(value) => {
-                    setBallot((current) => ({ ...current, [category.id]: value }))
-                    setSubmitted(false)
-                    setError("")
-                    setDuplicateVotes([])
-                  }}
-                  className="space-y-3"
-                >
-                  {finalistGroup.nominees.map((nominee) => (
-                    <Label
-                      key={nominee.name}
-                      htmlFor={`${category.id}-${nominee.name}`}
-                      className="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-4 transition hover:border-[hsl(355,78%,54%)] hover:bg-rose-50"
-                    >
-                      <RadioGroupItem id={`${category.id}-${nominee.name}`} value={nominee.name} className="mt-1" />
-                      <div>
-                        <p className="font-semibold text-slate-950">{nominee.name}</p>
-                        <p className="text-sm text-slate-500">{nominee.subtitle}</p>
-                      </div>
-                    </Label>
-                  ))}
-                </RadioGroup>
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
-
-      <Card className="sticky top-24 h-fit overflow-hidden border-slate-900 bg-slate-950 text-white">
-        <CardHeader className="border-b border-white/10">
-          <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10">
-            <Vote className="h-6 w-6 text-amber-300" />
-          </div>
-          <CardTitle className="text-2xl">Ballot summary</CardTitle>
-          <CardDescription className="text-slate-300">
-            This is the moment where fans feel the event is real. Make the final voting experience dead simple.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4 p-6">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <Label htmlFor="voterName" className="text-sm text-slate-300">
+        <div className="space-y-5 border-b border-amber-200 bg-[#fffaf0] p-5 sm:p-7">
+          <div className="space-y-2">
+            <Label htmlFor="voterName" className="text-base font-semibold text-slate-950">
               Your name
             </Label>
             <Input
               id="voterName"
-              className="mt-2 border-white/10 bg-slate-900 text-white placeholder:text-slate-500"
+              className="h-12 border-amber-200 bg-white text-base"
               placeholder="Your name"
               value={voterName}
               onChange={(event) => {
@@ -215,14 +145,14 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
             />
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <Label htmlFor="voterEmail" className="text-sm text-slate-300">
+          <div className="space-y-2">
+            <Label htmlFor="voterEmail" className="text-base font-semibold text-slate-950">
               Your email
             </Label>
             <Input
               id="voterEmail"
               type="email"
-              className="mt-2 border-white/10 bg-slate-900 text-white placeholder:text-slate-500"
+              className="h-12 border-amber-200 bg-white text-base"
               placeholder="you@example.com"
               value={voterEmail}
               onChange={(event) => {
@@ -232,44 +162,102 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
               }}
             />
           </div>
+        </div>
 
-          {selections.map((selection) => (
-            <div key={selection.category} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <p className="text-sm text-slate-400">{selection.category}</p>
-              <p className="mt-1 font-semibold text-white">{selection.nominee}</p>
+        {!ballotCategories.length ? (
+          <div className="border-b border-amber-100 p-5 sm:p-7">
+            <p className="text-lg font-semibold text-slate-950">No ballot choices published yet</p>
+            <p className="mt-2 text-slate-600">
+              Add finalists in the admin backend and this ballot will populate automatically.
+            </p>
+          </div>
+        ) : null}
+
+        {ballotCategories.map((category) => {
+          const finalistGroup = finalists.find((group) => group.categoryId === category.id)
+
+          if (!finalistGroup) {
+            return null
+          }
+
+          return (
+            <fieldset key={category.id} className="border-b border-amber-100 p-5 sm:p-7">
+              <legend className="text-xl font-bold text-slate-950">{category.title}</legend>
+              {category.description ? <p className="mt-1 text-sm leading-6 text-slate-500">{category.description}</p> : null}
+              <div className="mt-5">
+                <RadioGroup
+                  value={ballot[category.id]}
+                  onValueChange={(value) => {
+                    setBallot((current) => ({ ...current, [category.id]: value }))
+                    setSubmitted(false)
+                    setError("")
+                    setDuplicateVotes([])
+                  }}
+                  className="space-y-2"
+                >
+                  {finalistGroup.nominees.map((nominee) => (
+                    <Label
+                      key={nominee.name}
+                      htmlFor={`${category.id}-${nominee.name}`}
+                      className="flex cursor-pointer items-start gap-3 rounded border border-slate-200 bg-white p-4 text-base transition hover:border-[#c90000] hover:bg-red-50"
+                    >
+                      <RadioGroupItem id={`${category.id}-${nominee.name}`} value={nominee.name} className="mt-1 border-slate-400 text-[#c90000]" />
+                      <div>
+                        <p className="font-semibold text-slate-950">{nominee.name}</p>
+                        {nominee.subtitle ? <p className="text-sm text-slate-500">{nominee.subtitle}</p> : null}
+                      </div>
+                    </Label>
+                  ))}
+                </RadioGroup>
+              </div>
+            </fieldset>
+          )
+        })}
+
+        {completedCount ? (
+          <div className="border-b border-amber-100 bg-white p-5 sm:p-7">
+            <p className="font-semibold text-slate-950">Your selections</p>
+            <div className="mt-3 space-y-2 text-sm text-slate-600">
+              {selections.map((selection) => (
+                <p key={selection.id}>
+                  <span className="font-medium text-slate-950">{selection.category}:</span> {selection.nominee}
+                </p>
+              ))}
             </div>
-          ))}
+          </div>
+        ) : null}
 
+        <div className="space-y-4 p-5 sm:p-7">
           <Button
-            className="w-full bg-[hsl(42,96%,54%)] text-slate-950 hover:bg-[hsl(42,96%,48%)]"
+            className="h-12 w-full bg-[#c90000] text-base font-bold text-white hover:bg-[#a90000]"
             onClick={() => handleSubmit()}
-            disabled={isSubmitting || completedCount !== ballotCategories.length || !ballotCategories.length || !isOpen}
+            disabled={isSubmitting || !canSubmit}
           >
             {isSubmitting ? (
               <>
                 <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                Submitting ballot
+                Submitting vote
               </>
             ) : (
-              "Submit ballot"
+              "Submit Vote"
             )}
           </Button>
 
-          {error ? <p className="text-sm text-rose-300">{error}</p> : null}
-
-          {!isOpen ? <p className="text-sm text-amber-300">{closedMessage}</p> : null}
+          {!completedCount ? <p className="text-sm text-slate-500">Select at least one category to submit your vote.</p> : null}
+          {error ? <p className="text-sm text-rose-600">{error}</p> : null}
+          {!isOpen ? <p className="text-sm font-medium text-amber-700">{closedMessage}</p> : null}
 
           {submitted ? (
-            <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-sm text-emerald-100">
+            <div className="rounded border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
               <div className="mb-2 flex items-center gap-2 font-semibold">
                 <CheckCircle2 className="h-4 w-4" />
-                Ballot saved
+                Vote saved
               </div>
-              <p>Your Podscars votes are now stored live.</p>
+              <p>Your Podscars vote has been stored.</p>
             </div>
           ) : null}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <AlertDialog open={duplicateVotes.length > 0} onOpenChange={(open) => !open && setDuplicateVotes([])}>
         <AlertDialogContent className="max-h-[90vh] overflow-y-auto">
@@ -282,7 +270,7 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
           </AlertDialogHeader>
           <div className="space-y-3">
             {duplicateVotes.map((duplicate) => (
-              <div key={duplicate.categoryId} className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <div key={duplicate.categoryId} className="rounded border border-slate-200 bg-slate-50 p-4">
                 <p className="font-semibold text-slate-950">{duplicate.categoryTitle}</p>
                 <div className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
                   <div>
@@ -307,11 +295,11 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
               Keep old selection
             </AlertDialogAction>
             <AlertDialogAction
-              className="bg-[hsl(355,78%,54%)] text-white hover:bg-[hsl(355,78%,48%)]"
+              className="bg-[#c90000] text-white hover:bg-[#a90000]"
               disabled={isSubmitting}
               onClick={() => handleSubmit("overwrite")}
             >
-              Overwrite with new selection
+              Replace with new choice
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

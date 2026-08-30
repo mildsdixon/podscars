@@ -17,9 +17,8 @@ const bodyFont = Manrope({
 })
 
 export const metadata: Metadata = {
-  title: "Podscars | Nominations and Voting",
-  description: "A fan-powered platform for Podscars nominations, finalist voting, and awards planning.",
-  generator: "Codex",
+  title: "Podscars Awards | Vote Now",
+  description: "The 4th Annual Podscars Awards celebrates excellence in podcasting, creators, and film industry talent.",
 }
 
 export default function RootLayout({

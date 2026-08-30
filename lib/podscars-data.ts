@@ -19,7 +19,7 @@ export type PodscarsFinalistGroup = {
 export const defaultPodscarsCategories: PodscarsCategory[] = [
   {
     id: "best-overall-podcast",
-    title: "Best Overall Podcast",
+    title: "Best Over All Podcast",
     type: "podcast",
     description: "The standout podcast across content, consistency, audience impact, and overall execution.",
     nominationPrompt: "Nominate the podcast that deserves the top overall Podscars recognition.",
@@ -67,11 +67,25 @@ export const defaultPodscarsCategories: PodscarsCategory[] = [
     nominationPrompt: "Nominate an inspirational or personal development podcast.",
   },
   {
+    id: "best-engineer",
+    title: "Best Engineer",
+    type: "person",
+    description: "An engineer whose sound, technical polish, and production support helped a show stand out.",
+    nominationPrompt: "Nominate an engineer with standout podcast production work.",
+  },
+  {
     id: "best-original-music-and-sound-design",
     title: "Best Original Music and Sound Design",
     type: "podcast",
     description: "A podcast with memorable original music, soundscapes, scoring, mixing, or sonic identity.",
     nominationPrompt: "Nominate a podcast with outstanding original music or sound design.",
+  },
+  {
+    id: "best-producer",
+    title: "Best Producer",
+    type: "person",
+    description: "A producer whose vision, planning, and execution helped bring a standout show to life.",
+    nominationPrompt: "Nominate a producer with outstanding podcast production work.",
   },
   {
     id: "best-comedy-podcast",
@@ -110,7 +124,7 @@ export const defaultPodscarsCategories: PodscarsCategory[] = [
   },
   {
     id: "best-men-podcast",
-    title: "Best Men's Podcast",
+    title: "Best Man Podcast",
     type: "podcast",
     description: "A podcast centering men's voices, stories, development, culture, or experiences.",
     nominationPrompt: "Nominate a standout men-focused podcast.",
@@ -191,6 +205,76 @@ export const defaultPodscarsCategories: PodscarsCategory[] = [
     type: "podcast",
     description: "A podcast covering entertainment, celebrity, film, TV, music, internet culture, or cultural moments.",
     nominationPrompt: "Nominate a standout pop culture and entertainment podcast.",
+  },
+  {
+    id: "streaming-best-male",
+    title: "Streaming - Best Male",
+    type: "person",
+    description: "A standout male performer in streaming-first film, series, or digital storytelling.",
+    nominationPrompt: "Select the streaming male performer who deserves recognition.",
+  },
+  {
+    id: "streaming-best-female-actor",
+    title: "Streaming - Best Female Actor",
+    type: "person",
+    description: "A standout female actor in streaming-first film, series, or digital storytelling.",
+    nominationPrompt: "Select the streaming female actor who deserves recognition.",
+  },
+  {
+    id: "streaming-best-editor",
+    title: "Streaming - Best Editor",
+    type: "person",
+    description: "An editor whose pacing, polish, and storytelling helped a streaming project stand out.",
+    nominationPrompt: "Select the streaming editor who deserves recognition.",
+  },
+  {
+    id: "streaming-best-producer",
+    title: "Streaming - Best Producer",
+    type: "person",
+    description: "A producer whose leadership and execution helped bring a streaming project to life.",
+    nominationPrompt: "Select the streaming producer who deserves recognition.",
+  },
+  {
+    id: "streaming-best-writer",
+    title: "Streaming - Best Writer",
+    type: "person",
+    description: "A writer whose story, structure, dialogue, or creative vision stood out in streaming.",
+    nominationPrompt: "Select the streaming writer who deserves recognition.",
+  },
+  {
+    id: "streaming-best-villan",
+    title: "Streaming - Best Villan",
+    type: "person",
+    description: "A memorable villain performance in a streaming-first film or series.",
+    nominationPrompt: "Select the streaming villain performance that deserves recognition.",
+  },
+  {
+    id: "streaming-best-director",
+    title: "Streaming - Best Director",
+    type: "person",
+    description: "A director with standout vision, performances, pacing, and execution in streaming.",
+    nominationPrompt: "Select the streaming director who deserves recognition.",
+  },
+  {
+    id: "streaming-best-movie",
+    title: "Streaming - Best Movie",
+    type: "movie",
+    description: "A streaming-first movie with standout story, performances, production, and impact.",
+    nominationPrompt: "Select the streaming movie that deserves recognition.",
+  },
+  {
+    id: "streaming-best-supporting-actress",
+    title: "Streaming - Best Supporting Actress",
+    type: "person",
+    description: "A supporting actress whose performance elevated a streaming project.",
+    nominationPrompt: "Select the streaming supporting actress who deserves recognition.",
+  },
+  {
+    id: "streaming-best-supporting-actor",
+    title: "Streaming - Best Supporting Actor",
+    type: "person",
+    description: "A supporting actor whose performance elevated a streaming project.",
+    nominationPrompt: "Select the streaming supporting actor who deserves recognition.",
   },
 ]
 
@@ -307,27 +391,292 @@ export const organizerChecklist = [
 
 export const defaultSampleFinalists: PodscarsFinalistGroup[] = [
   {
-    categoryId: "host-of-the-year",
+    categoryId: "best-overall-podcast",
     nominees: [
-      { name: "Ava Monroe", subtitle: "Midnight Mic" },
-      { name: "Jordan Fields", subtitle: "The Signal Room" },
-      { name: "Maya Ellis", subtitle: "Close Friends Only" },
+      { name: "Talks Wit Todd and The Hip Hop Nerds", subtitle: "" },
+      { name: "Talking Ish With My Boyz", subtitle: "" },
+      { name: "Just My Thoughts Podcast", subtitle: "" },
+      { name: "RawButReal", subtitle: "" },
+      { name: "Ballin With Rich", subtitle: "" },
     ],
   },
   {
-    categoryId: "best-storytelling-podcast",
+    categoryId: "best-new-podcast",
     nominees: [
-      { name: "After The Static", subtitle: "Narrative documentary" },
-      { name: "Southbound Stories", subtitle: "Human-interest series" },
-      { name: "The Last Voicemail", subtitle: "Serialized investigation" },
+      { name: "Juss Lissen", subtitle: "" },
+      { name: "One Step Closer", subtitle: "" },
+      { name: "Estate Of Minds", subtitle: "" },
+      { name: "Detroit Equals Family", subtitle: "" },
+      { name: "We Listen and We Judge", subtitle: "" },
+      { name: "Just My Thoughts Podcast", subtitle: "" },
     ],
   },
   {
-    categoryId: "fan-favorite-screen-moment",
+    categoryId: "best-podcast-host",
     nominees: [
-      { name: "Neon Hearts", subtitle: "Indie romance feature" },
-      { name: "Signal Lost", subtitle: "Sci-fi thriller" },
-      { name: "The Last Encore", subtitle: "Music drama" },
+      { name: "Kevin Whitfeild", subtitle: "" },
+      { name: "John Q", subtitle: "" },
+      { name: "Yaminah Vasser", subtitle: "" },
+      { name: "Freckles on the Fashion", subtitle: "" },
+      { name: "Q.Lewis", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "best-marketing-and-promotions",
+    nominees: [
+      { name: "Good Game Productions", subtitle: "" },
+      { name: "Shawn P. Entertainment", subtitle: "" },
+      { name: "Detroit City Deals", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "best-podcast-network",
+    nominees: [
+      { name: "B2M Studios", subtitle: "" },
+      { name: "Podcast Your Voice", subtitle: "" },
+      { name: "Lit Studios", subtitle: "" },
+      { name: "MVSA Tv", subtitle: "" },
+      { name: "Podcastic", subtitle: "" },
+      { name: "Evry Media", subtitle: "" },
+      { name: "Soul TV", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "best-inspirational-and-personal-development-podcast",
+    nominees: [
+      { name: "The Carlson Collective", subtitle: "" },
+      { name: "Respectfully Speaking", subtitle: "" },
+      { name: "Stephanie Jessica Holley", subtitle: "" },
+      { name: "Vaquita Kennedy", subtitle: "" },
+      { name: "One Step Closer", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "best-engineer",
+    nominees: [
+      { name: "Super Producer Rico", subtitle: "" },
+      { name: "Milds Dixon", subtitle: "" },
+      { name: "Monique Heath", subtitle: "" },
+      { name: "Mark Pratt", subtitle: "" },
+      { name: "Nicole Nelms", subtitle: "" },
+      { name: "Chantel Mosley", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "best-original-music-and-sound-design",
+    nominees: [
+      { name: "G.A.M.G Big Flex", subtitle: "" },
+      { name: "We Listen and We Judge Podcast", subtitle: "" },
+      { name: "Man Cave Happy Hour", subtitle: "" },
+      { name: "Toxic Talk", subtitle: "" },
+      { name: "Real Game", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "best-producer",
+    nominees: [
+      { name: "Calvin Deal", subtitle: "" },
+      { name: "Quincy Lewis", subtitle: "" },
+      { name: "Chantel Mosley", subtitle: "" },
+      { name: "Rhea Conley", subtitle: "" },
+      { name: "Super Producer Rico", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "best-sports-podcast",
+    nominees: [
+      { name: "Real Game", subtitle: "" },
+      { name: "The Judge Podcast", subtitle: "" },
+      { name: "The Ring Review Wrestling Podcast", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "best-social-impact-podcast",
+    nominees: [
+      { name: "Talking Ish With My Boyz", subtitle: "" },
+      { name: "EMIY/Put Your Family First", subtitle: "" },
+      { name: "What Up Doe Podcast", subtitle: "" },
+      { name: "This is What We Do", subtitle: "" },
+      { name: "Detroit Table Talk", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "best-women-podcast",
+    nominees: [
+      { name: "1 Truth 2 Stories", subtitle: "" },
+      { name: "We Listen and We Judge", subtitle: "" },
+      { name: "Sisters With Opinion", subtitle: "" },
+      { name: "Estate Of Minds", subtitle: "" },
+      { name: "Your Inspired Journey", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "best-men-podcast",
+    nominees: [
+      { name: "Toxic Talk", subtitle: "" },
+      { name: "Girth", subtitle: "" },
+      { name: "Talks Wit Todd and The Hip Hop Nerds", subtitle: "" },
+      { name: "Just My Thoughts", subtitle: "" },
+      { name: "Ty Mopkins", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "best-food-and-drink-podcast",
+    nominees: [
+      { name: "Man Cave Happy Hour", subtitle: "" },
+      { name: "Girth", subtitle: "" },
+      { name: "We Listen and We Judge", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "best-business-podcast",
+    nominees: [
+      { name: "Black Fridays", subtitle: "" },
+      { name: "Loren Lewis", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "best-health-and-fitness-podcast",
+    nominees: [
+      { name: "G.A.M.G Big Flex", subtitle: "" },
+      { name: "Detroit City Deals", subtitle: "" },
+      { name: "Mentally Ill w/Dez Cortez", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "best-news-podcast",
+    nominees: [
+      { name: "J W/the News", subtitle: "" },
+      { name: "My Irish Radio", subtitle: "" },
+      { name: "Yaminah Lady Go Getter", subtitle: "" },
+      { name: "G.A.M.G", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "best-spirituality-and-religion-podcast",
+    nominees: [
+      { name: "Creative Emotions", subtitle: "" },
+      { name: "Your Inspired Journey", subtitle: "" },
+      { name: "Respectfully Speaking", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "best-duo-team-podcast",
+    nominees: [
+      { name: "Talking Ish With My Boyz", subtitle: "" },
+      { name: "RawButReal", subtitle: "" },
+      { name: "Respectfully Speaking", subtitle: "" },
+      { name: "Grown Folks Talk", subtitle: "" },
+      { name: "Houston Genius & Mizzion Smith", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "best-pop-culture-and-entertainment-podcast",
+    nominees: [
+      { name: "Talking Ish With My Boyz", subtitle: "" },
+      { name: "The Rise and Grind Morning Show", subtitle: "" },
+      { name: "Roadworks Records Podcast", subtitle: "" },
+      { name: "The Work After Dark Podcast", subtitle: "" },
+      { name: "Sucka Stroke", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "streaming-best-male",
+    nominees: [
+      { name: "Kamal Smith", subtitle: "" },
+      { name: "LeMaster Spratling", subtitle: "" },
+      { name: "Dejuan Ford", subtitle: "" },
+      { name: "Denzelle Dandridge", subtitle: "" },
+      { name: "Ro-Spit", subtitle: "" },
+      { name: "Quiten Sharp", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "streaming-best-female-actor",
+    nominees: [
+      { name: "NuNu Thurman", subtitle: "" },
+      { name: "Robyn Rose", subtitle: "" },
+      { name: "Stephanie Crawford", subtitle: "" },
+      { name: "Tia Blaque", subtitle: "" },
+      { name: "Vida Michelle", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "streaming-best-editor",
+    nominees: [
+      { name: "Nate Talbot", subtitle: "" },
+      { name: "Ju Did It", subtitle: "" },
+      { name: "Edit God (Don Bolton)", subtitle: "" },
+      { name: "Keith Rice", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "streaming-best-producer",
+    nominees: [
+      { name: "Michle Moore", subtitle: "" },
+      { name: "Rockey Black", subtitle: "" },
+      { name: "Wil Lewis III", subtitle: "" },
+      { name: "Darren Brown", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "streaming-best-writer",
+    nominees: [
+      { name: "Tiffani Hardy", subtitle: "" },
+      { name: "Jenai Leonard", subtitle: "" },
+      { name: "Denise Mon't", subtitle: "" },
+      { name: "Joe Smith", subtitle: "" },
+      { name: "Dave Doe", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "streaming-best-villan",
+    nominees: [
+      { name: "Kamal Smith", subtitle: "" },
+      { name: "Don Snipes", subtitle: "" },
+      { name: "Coke Horner", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "streaming-best-director",
+    nominees: [
+      { name: "Joe Smith", subtitle: "" },
+      { name: "Shelby Leigh", subtitle: "" },
+      { name: "Tonja Shoe Lady Ayers", subtitle: "" },
+      { name: "Richard Bass", subtitle: "" },
+      { name: "Kamal Smith", subtitle: "" },
+      { name: "Rockey Black", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "streaming-best-movie",
+    nominees: [
+      { name: "Heart of a Women", subtitle: "" },
+      { name: "Ultimate Vindetta", subtitle: "" },
+      { name: "In All The Wrong Places", subtitle: "" },
+      { name: "What About Your Friends", subtitle: "" },
+      { name: "Kayla", subtitle: "" },
+      { name: "Just A Friend", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "streaming-best-supporting-actress",
+    nominees: [
+      { name: "Lauren Session", subtitle: "" },
+      { name: "Tierra Jacole", subtitle: "" },
+      { name: "Sabree Whitfield", subtitle: "" },
+      { name: "Tia Blaque", subtitle: "" },
+      { name: "Kia B", subtitle: "" },
+      { name: "Misha Bivons", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "streaming-best-supporting-actor",
+    nominees: [
+      { name: "Steve White", subtitle: "" },
+      { name: "Don Snipes", subtitle: "" },
+      { name: "Marrion Hamm III", subtitle: "" },
+      { name: "Robert Q Jackson", subtitle: "" },
     ],
   },
 ]

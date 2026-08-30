@@ -12,13 +12,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { SignOutButton } from "@/components/podscars/sign-out-button"
 import type { AdSpot } from "@/lib/podscars-ads"
 import type { AdminSettings } from "@/lib/podscars-admin"
-import type { PodscarsCategory } from "@/lib/podscars-data"
+import type { PodscarsCategory, PodscarsFinalistGroup } from "@/lib/podscars-data"
 import type { LiveNomination, PodscarsLiveData } from "@/lib/podscars-live"
 
 type AdminDashboardProps = {
   initialSettings: AdminSettings
   nominations: LiveNomination[]
   categories: PodscarsCategory[]
+  finalists: PodscarsFinalistGroup[]
   contentSource: "fallback" | "supabase"
   stats: PodscarsLiveData["stats"]
   source: PodscarsLiveData["source"]
@@ -33,10 +34,73 @@ const categoryTypes = [
   { value: "movie", label: "Movies" },
 ] as const
 
+function finalistGroupsToText(categories: PodscarsCategory[], finalists: PodscarsFinalistGroup[]) {
+  return categories
+    .map((category) => {
+      const nominees = finalists.find((group) => group.categoryId === category.id)?.nominees || []
+
+      if (!nominees.length) {
+        return ""
+      }
+
+      return [category.title, ...nominees.map((nominee, index) => `${index + 1}) ${nominee.name}`)].join("\n")
+    })
+    .filter(Boolean)
+    .join("\n\n")
+}
+
+function normalizeTitle(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+}
+
+function parseFinalistText(text: string, categories: PodscarsCategory[]) {
+  const categoryByTitle = new Map(categories.map((category) => [normalizeTitle(category.title), category]))
+  const groups = new Map<string, { name: string; subtitle: string }[]>()
+  let currentCategoryId = ""
+
+  text.split(/\r?\n/).forEach((rawLine) => {
+    const line = rawLine.trim()
+
+    if (!line) {
+      return
+    }
+
+    const maybeCategory = categoryByTitle.get(normalizeTitle(line.replace(/-+$/, "")))
+
+    if (maybeCategory) {
+      currentCategoryId = maybeCategory.id
+      if (!groups.has(currentCategoryId)) {
+        groups.set(currentCategoryId, [])
+      }
+      return
+    }
+
+    if (!currentCategoryId) {
+      return
+    }
+
+    const nomineeName = line.replace(/^\d+[\).]\s*/, "").trim()
+
+    if (nomineeName) {
+      const nominees = groups.get(currentCategoryId) || []
+      nominees.push({ name: nomineeName, subtitle: "" })
+      groups.set(currentCategoryId, nominees)
+    }
+  })
+
+  return Array.from(groups.entries())
+    .filter(([, nominees]) => nominees.length)
+    .map(([categoryId, nominees]) => ({ categoryId, nominees }))
+}
+
 export function AdminDashboard({
   initialSettings,
   nominations,
   categories,
+  finalists,
   contentSource,
   stats,
   source,
@@ -47,6 +111,7 @@ export function AdminDashboard({
   const [nominationItems, setNominationItems] = useState(nominations)
   const [categoryItems, setCategoryItems] = useState(categories)
   const [adSpotItems, setAdSpotItems] = useState(initialAdSpots)
+  const [finalistText, setFinalistText] = useState(() => finalistGroupsToText(categories, finalists))
   const [categoryForm, setCategoryForm] = useState({
     title: "",
     type: "podcast" as PodscarsCategory["type"],
@@ -54,6 +119,7 @@ export function AdminDashboard({
     nominationPrompt: "",
   })
   const [categorySaveState, setCategorySaveState] = useState<"idle" | "saving" | "saved" | "preview">("idle")
+  const [finalistSaveState, setFinalistSaveState] = useState<"idle" | "saving" | "saved" | "preview">("idle")
   const [adSaveState, setAdSaveState] = useState<"idle" | "saving" | "saved">("idle")
   const [uploadingAdId, setUploadingAdId] = useState<number | null>(null)
   const [bannerUploadState, setBannerUploadState] = useState<"idle" | "uploading" | "saved">("idle")
@@ -169,6 +235,48 @@ export function AdminDashboard({
       console.error(categoryError)
       setError("Could not save category.")
       setCategorySaveState("idle")
+    }
+  }
+
+  async function handleSaveFinalists() {
+    setFinalistSaveState("saving")
+    setError("")
+
+    const parsedFinalists = parseFinalistText(finalistText, categoryItems)
+
+    if (!parsedFinalists.length) {
+      setError("Add at least one category title and nominee choice before saving ballot finalists.")
+      setFinalistSaveState("idle")
+      return
+    }
+
+    if (contentSource === "fallback") {
+      setFinalistSaveState("preview")
+      return
+    }
+
+    try {
+      const response = await fetch("/api/admin/finalists", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ finalists: parsedFinalists }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.error || "Could not save ballot finalists.")
+        setFinalistSaveState("idle")
+        return
+      }
+
+      setFinalistSaveState("saved")
+    } catch (finalistError) {
+      console.error(finalistError)
+      setError("Could not save ballot finalists.")
+      setFinalistSaveState("idle")
     }
   }
 
@@ -594,6 +702,54 @@ export function AdminDashboard({
               </div>
             ))}
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle className="text-3xl text-slate-950">Ballot finalists</CardTitle>
+          <CardDescription className="text-base text-slate-600">
+            Edit the public Vote Now choices. Use a category title, then numbered nominee choices underneath it.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Textarea
+            value={finalistText}
+            onChange={(event) => {
+              setFinalistText(event.target.value)
+              setFinalistSaveState("idle")
+            }}
+            className="min-h-[420px] font-mono text-sm leading-6"
+            placeholder={`Best Overall Podcast\n1) Talks Wit Todd and The Hip Hop Nerds\n2) Talking Ish With My Boyz`}
+          />
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+            Category headings must match an existing nomination category title. Add more choices by adding more numbered
+            lines under the category.
+          </div>
+          <Button
+            className="w-full bg-slate-950 text-white hover:bg-slate-800"
+            onClick={handleSaveFinalists}
+            disabled={finalistSaveState === "saving"}
+          >
+            {finalistSaveState === "saving" ? (
+              <>
+                <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                Saving ballot choices
+              </>
+            ) : finalistSaveState === "saved" ? (
+              <>
+                <ShieldCheck className="mr-2 h-4 w-4" />
+                Ballot choices saved
+              </>
+            ) : finalistSaveState === "preview" ? (
+              "Added to preview"
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Save ballot choices
+              </>
+            )}
+          </Button>
         </CardContent>
       </Card>
 

@@ -1,8 +1,7 @@
 import Link from "next/link"
-import { ArrowRight, Ticket, Trophy } from "lucide-react"
+import { CalendarDays, Star, Ticket, Vote } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { AdvertisingCarousel } from "@/components/podscars/advertising-carousel"
 import { getAdSpots } from "@/lib/podscars-ads"
 import { getAdminSettings } from "@/lib/podscars-admin"
@@ -15,21 +14,44 @@ export default async function HomePage() {
   const [adSpots, settings] = await Promise.all([getAdSpots(), getAdminSettings()])
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#fff8ef_0%,#ffffff_35%,#f8fafc_100%)]">
-      <section className="relative overflow-hidden border-b border-black/5">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(244,63,94,0.14),transparent_30%),radial-gradient(circle_at_top_right,rgba(245,158,11,0.2),transparent_35%)]" />
-        <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-20 md:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:py-28">
-          <div>
-            <Badge className="mb-5 bg-slate-950 text-white hover:bg-slate-900">
-              Podscars Awards Platform
-            </Badge>
-            <h1 className="max-w-3xl font-serif text-5xl leading-tight text-slate-950 md:text-7xl">
-              Podscars for nominations, voting, and winners.
+    <div className="min-h-screen bg-white">
+      <section className="relative overflow-hidden border-b border-amber-200/70 bg-white">
+        <div className="absolute inset-0 bg-[url('/podscars-artwork/awards-hero-1880x940.jpg')] bg-cover bg-center opacity-20" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.92)_42%,rgba(255,255,255,0.58)_68%,rgba(255,255,255,0.16)_100%)]" />
+        <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 md:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:py-20">
+          <div className="max-w-2xl">
+            <div className="mb-6 flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.34em] text-[#a06d12]">
+              <Star className="h-4 w-4 fill-[#c98a1d] text-[#c98a1d]" />
+              Honoring excellence in podcasting
+            </div>
+            <h1 className="font-serif text-5xl leading-[0.98] text-slate-950 md:text-7xl lg:text-8xl">
+              The 4th Annual Podscars Awards
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600 md:text-xl">
-              A live awards site with editable categories, fan voting, and persisted submissions.
+            <p className="mt-6 max-w-xl text-lg font-semibold uppercase tracking-[0.22em] text-slate-950 md:text-xl">
+              Friday, October 9, 2026
             </p>
-            <div className="mt-7 w-full max-w-[717px] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+            <p className="mt-4 max-w-xl text-base leading-8 text-slate-600 md:text-lg">
+              Celebrate podcasters, creators, and film industry talent with a polished awards-night experience built for fans to vote and support the event.
+            </p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <Link href="/vote">
+                <Button size="lg" className="w-full bg-[#c90000] px-8 text-white shadow-[0_12px_28px_rgba(201,0,0,0.26)] hover:bg-[#a90000] sm:w-auto">
+                  Vote Now
+                  <Vote className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href={PODSCARS_TICKET_URL} target="_blank" rel="noopener noreferrer">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full border-[#b78320] bg-white px-8 text-slate-950 hover:bg-amber-50 sm:w-auto"
+                >
+                  Buy Tickets Now
+                  <Ticket className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+            <div className="mt-7 w-full max-w-[717px] overflow-hidden rounded border border-[#d3a247] bg-white shadow-[0_18px_50px_rgba(160,109,18,0.18)]">
               <div className="aspect-[717/223] w-full bg-slate-100">
                 <img
                   src={settings.heroBannerImageUrl}
@@ -38,78 +60,39 @@ export default async function HomePage() {
                 />
               </div>
             </div>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href="/nominate">
-                <Button size="lg" className="w-full bg-[hsl(355,78%,54%)] px-7 text-white hover:bg-[hsl(355,78%,48%)] sm:w-auto">
-                  Start nominations
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href={PODSCARS_TICKET_URL} target="_blank" rel="noopener noreferrer">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="w-full border-slate-950 bg-white px-7 text-slate-950 hover:bg-slate-100 sm:w-auto"
-                >
-                  Buy Tickets Now
-                  <Ticket className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
           </div>
 
-          <Card className="overflow-hidden border-slate-950 bg-slate-950 text-white shadow-[0_30px_100px_rgba(15,23,42,0.35)]">
-            <CardHeader className="border-b border-white/10 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.28),transparent_45%)]">
-              <div className="mb-4 flex items-center gap-3">
-                <div className="rounded-2xl bg-white/10 p-3">
-                  <Trophy className="h-7 w-7 text-amber-300" />
-                </div>
-                <div>
-                  <CardTitle className="text-2xl">How it works</CardTitle>
-                  <CardDescription className="text-slate-300">Simple and fast to launch.</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4 p-6">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="font-semibold text-white">1. Nominations</p>
-                <p className="mt-1 text-sm text-slate-300">Fans submit picks straight into the database.</p>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="font-semibold text-white">2. Finalists</p>
-                <p className="mt-1 text-sm text-slate-300">You review and shortlist from live records.</p>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="font-semibold text-white">3. Voting</p>
-                <p className="mt-1 text-sm text-slate-300">Fans cast one vote per category.</p>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-[linear-gradient(135deg,rgba(244,63,94,0.25),rgba(245,158,11,0.2))] p-4">
-                <p className="font-semibold text-white">4. Winners</p>
-                <p className="mt-1 text-sm text-slate-100">Leaderboard-ready results update from stored ballots.</p>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="relative hidden min-h-[520px] lg:block">
+            <img
+              src="/podscars-artwork/awards-post.jpg"
+              alt="Podscars Awards red carpet artwork"
+              className="absolute right-0 top-1/2 h-[560px] w-auto -translate-y-1/2 object-contain drop-shadow-[0_30px_60px_rgba(160,109,18,0.26)]"
+            />
+          </div>
         </div>
       </section>
 
       <AdvertisingCarousel spots={adSpots} />
 
-      <section className="border-y border-slate-200 bg-slate-950 py-16 text-white">
+      <section className="border-y border-amber-200 bg-[linear-gradient(180deg,#ffffff_0%,#fff8eb_100%)] py-16 text-slate-950">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 md:px-6 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-amber-300">{settings.homepageFlowEyebrow}</p>
+            <p className="text-sm font-extrabold uppercase tracking-[0.25em] text-[#a06d12]">{settings.homepageFlowEyebrow}</p>
             <h2 className="mt-3 font-serif text-4xl">{settings.homepageFlowTitle}</h2>
-            <p className="mt-4 max-w-xl text-slate-300">{settings.homepageFlowSummary}</p>
+            <p className="mt-4 max-w-xl text-slate-600">{settings.homepageFlowSummary}</p>
           </div>
 
           <div className="grid gap-4">
             {campaignTimeline.map((item) => (
-              <div key={item.phase} className="rounded-3xl border border-white/10 bg-white/5 p-5">
+              <div key={item.phase} className="rounded border border-amber-200 bg-white p-5 shadow-[0_14px_34px_rgba(160,109,18,0.08)]">
                 <div className="flex items-center justify-between gap-4">
                   <p className="text-xl font-semibold">{item.phase}</p>
-                  <Badge className="bg-white/10 text-white hover:bg-white/10">{item.window}</Badge>
+                  <Badge className="bg-slate-950 text-white hover:bg-slate-950">
+                    <CalendarDays className="mr-1.5 h-3.5 w-3.5" />
+                    {item.window}
+                  </Badge>
                 </div>
-                <p className="mt-2 text-slate-300">{item.description}</p>
+                <p className="mt-2 text-slate-600">{item.description}</p>
               </div>
             ))}
           </div>

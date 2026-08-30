@@ -58,7 +58,7 @@ export async function getPodscarsContent(): Promise<PodscarsContent> {
 
     return {
       categories,
-      finalists,
+      finalists: finalists.length ? finalists : defaultSampleFinalists,
       source: "supabase",
     }
   } catch (error) {
