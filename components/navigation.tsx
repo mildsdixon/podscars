@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
-import { Menu, Ticket, Trophy, Vote } from "lucide-react"
+import { ExternalLink, Menu, Ticket, Trophy, Vote } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { PODSCARS_TICKET_URL } from "@/lib/podscars-tickets"
@@ -14,7 +14,8 @@ const navItems = [
 ]
 
 const ticketItem = { href: PODSCARS_TICKET_URL, label: "Buy Tickets Now", icon: Ticket }
-const mobileNavItems = [...navItems, ticketItem]
+const facebookItem = { href: "https://www.facebook.com/ThePodscars", label: "Follow us on Facebook", icon: ExternalLink }
+const mobileNavItems = [...navItems, facebookItem, ticketItem]
 
 export function Navigation() {
   const pathname = usePathname()
@@ -54,12 +55,23 @@ export function Navigation() {
           })}
         </div>
 
-        <Link href={ticketItem.href} target="_blank" rel="noopener noreferrer" className="hidden shrink-0 lg:block">
-          <Button className="bg-[hsl(355,78%,54%)] px-5 text-white hover:bg-[hsl(355,78%,48%)]">
-            <Ticket className="h-4 w-4" />
-            Buy Tickets Now
-          </Button>
-        </Link>
+        <div className="hidden shrink-0 items-center gap-3 lg:flex">
+          <Link
+            href={facebookItem.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 transition-colors hover:text-[#c90000]"
+          >
+            <ExternalLink className="h-4 w-4" />
+            <span className="whitespace-nowrap">Follow us on Facebook</span>
+          </Link>
+          <Link href={ticketItem.href} target="_blank" rel="noopener noreferrer">
+            <Button className="bg-[hsl(355,78%,54%)] px-5 text-white hover:bg-[hsl(355,78%,48%)]">
+              <Ticket className="h-4 w-4" />
+              Buy Tickets Now
+            </Button>
+          </Link>
+        </div>
 
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild className="lg:hidden">
