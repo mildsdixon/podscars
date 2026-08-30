@@ -20,7 +20,7 @@ export default async function HomePage() {
           <div className="max-w-2xl">
             <div className="mb-6 flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.34em] text-[#a06d12]">
               <Star className="h-4 w-4 fill-[#c98a1d] text-[#c98a1d]" />
-              Honoring excellence in podcasting
+              Honoring excellence in podcasting and streaming
             </div>
             <h1 className="font-serif text-5xl leading-[0.98] text-slate-950 md:text-7xl lg:text-8xl">
               The 4th Annual Podscars Awards
