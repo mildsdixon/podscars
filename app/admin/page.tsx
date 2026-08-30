@@ -48,7 +48,7 @@ export default async function AdminPage() {
             <Badge className="bg-slate-950 text-white hover:bg-slate-900">Admin backend</Badge>
             <h1 className="mt-4 font-serif text-5xl text-slate-950 md:text-6xl">Podscars control room.</h1>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-600">
-              Manage public access, moderate nominations, and keep an eye on real submission totals.
+              Manage voting, ballot choices, advertising, and live submission totals.
             </p>
           </div>
         </section>
@@ -56,14 +56,10 @@ export default async function AdminPage() {
         <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
           <AdminDashboard
             initialSettings={settings}
-            nominations={liveData.nominations}
-            votes={liveData.votes}
-            leaderboard={liveData.leaderboard}
             categories={content.categories}
             finalists={content.finalists}
             contentSource={content.source}
             stats={liveData.stats}
-            source={liveData.source}
             authMode="supabase"
             initialAdSpots={adSpots}
           />
@@ -105,7 +101,7 @@ export default async function AdminPage() {
           <Badge className="bg-slate-950 text-white hover:bg-slate-900">Admin backend</Badge>
           <h1 className="mt-4 font-serif text-5xl text-slate-950 md:text-6xl">Podscars control room.</h1>
           <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-600">
-            Manage public access, moderate nominations, and keep an eye on real submission totals.
+            Manage voting, ballot choices, advertising, and live submission totals.
           </p>
         </div>
       </section>
@@ -113,14 +109,10 @@ export default async function AdminPage() {
       <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
         <AdminDashboard
           initialSettings={settings}
-          nominations={liveData.nominations}
-          votes={liveData.votes}
-          leaderboard={liveData.leaderboard}
           categories={content.categories}
           finalists={content.finalists}
           contentSource={content.source}
           stats={liveData.stats}
-          source={liveData.source}
           authMode="password"
           initialAdSpots={adSpots}
         />

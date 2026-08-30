@@ -13,23 +13,18 @@ import { SignOutButton } from "@/components/podscars/sign-out-button"
 import type { AdSpot } from "@/lib/podscars-ads"
 import type { AdminSettings } from "@/lib/podscars-admin"
 import type { PodscarsCategory, PodscarsFinalistGroup } from "@/lib/podscars-data"
-import type { LiveNomination, LiveVote, PodscarsLiveData, VoteLeaderboardEntry } from "@/lib/podscars-live"
+import type { PodscarsLiveData } from "@/lib/podscars-live"
 
 type AdminDashboardProps = {
   initialSettings: AdminSettings
-  nominations: LiveNomination[]
-  votes: LiveVote[]
-  leaderboard: VoteLeaderboardEntry[]
   categories: PodscarsCategory[]
   finalists: PodscarsFinalistGroup[]
   contentSource: "fallback" | "supabase"
   stats: PodscarsLiveData["stats"]
-  source: PodscarsLiveData["source"]
   authMode: "password" | "supabase"
   initialAdSpots: AdSpot[]
 }
 
-const nominationStatuses = ["New", "In Review", "Approved", "Finalist", "Rejected"]
 const categoryTypes = [
   { value: "person", label: "People" },
   { value: "podcast", label: "Podcasts" },
@@ -100,19 +95,14 @@ function parseFinalistText(text: string, categories: PodscarsCategory[]) {
 
 export function AdminDashboard({
   initialSettings,
-  nominations,
-  votes,
-  leaderboard,
   categories,
   finalists,
   contentSource,
   stats,
-  source,
   authMode,
   initialAdSpots,
 }: AdminDashboardProps) {
   const [settings, setSettings] = useState(initialSettings)
-  const [nominationItems, setNominationItems] = useState(nominations)
   const [categoryItems, setCategoryItems] = useState(categories)
   const [adSpotItems, setAdSpotItems] = useState(initialAdSpots)
   const [finalistText, setFinalistText] = useState(() => finalistGroupsToText(categories, finalists))
@@ -129,7 +119,6 @@ export function AdminDashboard({
   const [bannerUploadState, setBannerUploadState] = useState<"idle" | "uploading" | "saved">("idle")
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle")
   const [error, setError] = useState("")
-  const [pendingStatusId, setPendingStatusId] = useState<string | null>(null)
 
   async function handleSaveSettings() {
     setSaveState("saving")
@@ -161,43 +150,12 @@ export function AdminDashboard({
     }
   }
 
-  async function handleStatusChange(id: string, status: string) {
-    setPendingStatusId(id)
-    setError("")
-
-    try {
-      const response = await fetch("/api/admin/nominations", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id, status }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.error || "Could not update nomination status.")
-        return
-      }
-
-      setNominationItems((current) =>
-        current.map((nomination) => (nomination.id === id ? { ...nomination, status } : nomination)),
-      )
-    } catch (statusError) {
-      console.error(statusError)
-      setError("Could not update nomination status.")
-    } finally {
-      setPendingStatusId(null)
-    }
-  }
-
   async function handleAddCategory() {
     setCategorySaveState("saving")
     setError("")
 
     if (!categoryForm.title || !categoryForm.description || !categoryForm.nominationPrompt) {
-      setError("Add a title, description, and nomination prompt for the category.")
+      setError("Add a title, description, and voting prompt for the category.")
       setCategorySaveState("idle")
       return
     }
@@ -397,13 +355,7 @@ export function AdminDashboard({
 
   return (
     <div className="space-y-6">
-      <section className="grid gap-4 md:grid-cols-3">
-        <Card className="bg-white">
-          <CardHeader className="pb-2">
-            <CardDescription>Nominations</CardDescription>
-            <CardTitle className="text-3xl">{stats.nominations}</CardTitle>
-          </CardHeader>
-        </Card>
+      <section className="grid gap-4 md:grid-cols-2">
         <Card className="bg-white">
           <CardHeader className="pb-2">
             <CardDescription>Votes</CardDescription>
@@ -595,9 +547,9 @@ export function AdminDashboard({
 
       <Card className="bg-white">
         <CardHeader>
-          <CardTitle className="text-3xl text-slate-950">Nomination categories</CardTitle>
+          <CardTitle className="text-3xl text-slate-950">Voting categories</CardTitle>
           <CardDescription className="text-base text-slate-600">
-            Add the categories fans can choose from on the nomination form.
+            Add the categories fans can choose from on the voting ballot.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
@@ -652,7 +604,7 @@ export function AdminDashboard({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="category-prompt">Nomination prompt</Label>
+              <Label htmlFor="category-prompt">Voting prompt</Label>
               <Textarea
                 id="category-prompt"
                 value={categoryForm.nominationPrompt}
@@ -660,7 +612,7 @@ export function AdminDashboard({
                   setCategoryForm((current) => ({ ...current, nominationPrompt: event.target.value }))
                   setCategorySaveState("idle")
                 }}
-                placeholder="Nominate a show, host, movie, or creator."
+                placeholder="Vote for a show, host, movie, or creator."
                 className="min-h-24"
               />
             </div>
@@ -727,8 +679,8 @@ export function AdminDashboard({
             placeholder={`Best Overall Podcast\n1) Talks Wit Todd and The Hip Hop Nerds\n2) Talking Ish With My Boyz`}
           />
           <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-            Category headings must match an existing nomination category title. Add more choices by adding more numbered
-            lines under the category.
+            Category headings must match an existing voting category title. Add more choices by adding more numbered lines
+            under the category.
           </div>
           <Button
             className="w-full bg-slate-950 text-white hover:bg-slate-800"
@@ -766,7 +718,7 @@ export function AdminDashboard({
               </div>
               <CardTitle className="text-3xl text-slate-950">Access controls</CardTitle>
               <CardDescription className="text-base text-slate-600">
-                Open or close the public nomination and voting flows instantly.
+                Open or close the public voting flow instantly.
               </CardDescription>
             </div>
             {authMode === "supabase" ? (
@@ -784,34 +736,6 @@ export function AdminDashboard({
             )}
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="rounded-3xl border border-slate-200 p-5">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="font-semibold text-slate-950">Nominations open</p>
-                  <p className="text-sm text-slate-500">Controls the public `/nominate` form and API.</p>
-                </div>
-                <Switch
-                  checked={settings.nominationsOpen}
-                  onCheckedChange={(checked) => {
-                    setSettings((current) => ({ ...current, nominationsOpen: checked }))
-                    setSaveState("idle")
-                  }}
-                />
-              </div>
-              <div className="mt-4 space-y-2">
-                <Label htmlFor="nominations-message">Closed-state message</Label>
-                <Textarea
-                  id="nominations-message"
-                  value={settings.nominationsMessage}
-                  onChange={(event) => {
-                    setSettings((current) => ({ ...current, nominationsMessage: event.target.value }))
-                    setSaveState("idle")
-                  }}
-                  className="min-h-24"
-                />
-              </div>
-            </div>
-
             <div className="rounded-3xl border border-slate-200 p-5">
               <div className="flex items-center justify-between gap-4">
                 <div>
@@ -906,62 +830,6 @@ export function AdminDashboard({
           </CardContent>
         </Card>
 
-        <Card className="bg-white">
-          <CardHeader>
-            <CardTitle className="text-3xl text-slate-950">Nomination moderation</CardTitle>
-            <CardDescription className="text-base text-slate-600">
-              Review incoming nominations and move them through your shortlist workflow.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {!nominationItems.length ? (
-              <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-slate-600">
-                No nominations have been submitted yet.
-              </div>
-            ) : null}
-
-            {nominationItems.map((nomination) => (
-              <div key={nomination.id} className="rounded-3xl border border-slate-200 p-5">
-                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                  <div className="space-y-1">
-                    <p className="text-lg font-semibold text-slate-950">{nomination.nomineeName}</p>
-                    <p className="text-sm text-slate-500">{nomination.categoryTitle}</p>
-                    <p className="text-sm text-slate-600">Submitted by {nomination.submittedBy}</p>
-                  </div>
-                  <div className="w-full md:w-56">
-                    <Label htmlFor={`status-${nomination.id}`}>Status</Label>
-                    <Select
-                      value={nomination.status}
-                      onValueChange={(value) => void handleStatusChange(nomination.id, value)}
-                      disabled={pendingStatusId === nomination.id}
-                    >
-                      <SelectTrigger id={`status-${nomination.id}`} className="mt-2">
-                        <SelectValue placeholder="Update status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {nominationStatuses.map((status) => (
-                          <SelectItem key={status} value={status}>
-                            {status}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="mt-4 grid gap-3 text-sm text-slate-600 md:grid-cols-2">
-                  <div className="rounded-2xl bg-slate-50 p-4">
-                    <p className="font-medium text-slate-950">Project</p>
-                    <p className="mt-1">{nomination.projectTitle || "No project title provided."}</p>
-                  </div>
-                  <div className="rounded-2xl bg-slate-50 p-4">
-                    <p className="font-medium text-slate-950">Record ID</p>
-                    <Input value={nomination.id} readOnly className="mt-1 bg-white" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
       </section>
     </div>
   )
