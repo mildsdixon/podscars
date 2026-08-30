@@ -419,6 +419,7 @@ export const defaultSampleFinalists: PodscarsFinalistGroup[] = [
       { name: "Yaminah Vasser", subtitle: "" },
       { name: "Freckles on the Fashion", subtitle: "" },
       { name: "Q.Lewis", subtitle: "" },
+      { name: "Lake B. Everywhere", subtitle: "" },
     ],
   },
   {
