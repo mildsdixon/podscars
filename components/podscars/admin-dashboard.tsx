@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { ImageIcon, LoaderCircle, RefreshCw, Save, Settings2, ShieldCheck, Trophy } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -33,6 +33,8 @@ const categoryTypes = [
   { value: "podcast", label: "Podcasts" },
   { value: "movie", label: "Movies" },
 ] as const
+
+const pieColors = ["#c90000", "#f59e0b", "#111827", "#64748b", "#b45309", "#dc2626", "#78716c", "#facc15"]
 
 function finalistGroupsToText(categories: PodscarsCategory[], finalists: PodscarsFinalistGroup[]) {
   return categories
@@ -688,6 +690,51 @@ export function AdminDashboard({
                       </span>
                     </div>
                   </div>
+
+                  {group.totalVotes ? (
+                    <div className="mt-5 grid gap-4 rounded-2xl border border-slate-100 bg-white p-4 lg:grid-cols-[210px_1fr]">
+                      <div className="h-[210px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={group.nominees.filter((nominee) => nominee.votes > 0)}
+                              dataKey="votes"
+                              nameKey="name"
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={82}
+                              labelLine={false}
+                              label={({ percent }) => `${Math.round((percent || 0) * 100)}%`}
+                            >
+                              {group.nominees
+                                .filter((nominee) => nominee.votes > 0)
+                                .map((nominee, index) => (
+                                  <Cell key={`${group.categoryId}-${nominee.name}-slice`} fill={pieColors[index % pieColors.length]} />
+                                ))}
+                            </Pie>
+                            <Tooltip formatter={(value) => [`${value} votes`, "Votes"]} />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-400">Vote share</p>
+                        {group.nominees
+                          .filter((nominee) => nominee.votes > 0)
+                          .map((nominee, index) => (
+                            <div key={`${group.categoryId}-${nominee.name}-legend`} className="flex items-center justify-between gap-3 text-sm">
+                              <div className="flex min-w-0 items-center gap-2">
+                                <span
+                                  className="h-3 w-3 shrink-0 rounded-full"
+                                  style={{ backgroundColor: pieColors[index % pieColors.length] }}
+                                />
+                                <span className="truncate font-medium text-slate-700">{nominee.name}</span>
+                              </div>
+                              <span className="shrink-0 font-bold text-slate-950">{nominee.share}%</span>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  ) : null}
 
                   <div className="mt-5 space-y-3">
                     {group.nominees.map((nominee) => (
