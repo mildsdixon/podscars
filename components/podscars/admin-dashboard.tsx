@@ -104,6 +104,7 @@ function formatRefreshTime(value: Date) {
   return new Intl.DateTimeFormat("en-US", {
     hour: "numeric",
     minute: "2-digit",
+    timeZone: "America/Detroit",
   }).format(value)
 }
 
@@ -117,6 +118,7 @@ function formatSubmittedTime(value: string | null) {
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
+    timeZone: "America/Detroit",
   }).format(new Date(value))
 }
 
@@ -151,7 +153,7 @@ export function AdminDashboard({
   const [bannerUploadState, setBannerUploadState] = useState<"idle" | "uploading" | "saved">("idle")
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle")
   const [voteRefreshState, setVoteRefreshState] = useState<"idle" | "refreshing">("idle")
-  const [lastVoteRefresh, setLastVoteRefresh] = useState(() => new Date())
+  const [lastVoteRefresh, setLastVoteRefresh] = useState<Date | null>(null)
   const [error, setError] = useState("")
   const categoryVoteChart = useMemo(() => {
     const grouped = new Map<string, { category: string; fullCategory: string; votes: number }>()
@@ -325,6 +327,8 @@ export function AdminDashboard({
   }
 
   useEffect(() => {
+    setLastVoteRefresh(new Date())
+
     const interval = window.setInterval(() => {
       void refreshVoteChart(true)
     }, 15000)
@@ -589,7 +593,9 @@ export function AdminDashboard({
             <CardDescription className="text-base text-slate-600">
               Category totals refresh automatically while voting is open.
             </CardDescription>
-            <p className="mt-2 text-sm text-slate-500">Last checked {formatRefreshTime(lastVoteRefresh)}</p>
+            <p className="mt-2 text-sm text-slate-500">
+              Last checked {lastVoteRefresh ? formatRefreshTime(lastVoteRefresh) : "just now"}
+            </p>
           </div>
           <Button
             variant="outline"
