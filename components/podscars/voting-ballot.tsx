@@ -173,44 +173,54 @@ export function VotingBallot({ categories, finalists, isOpen, closedMessage }: V
           </div>
         ) : null}
 
-        {ballotCategories.map((category) => {
+        {ballotCategories.map((category, index) => {
           const finalistGroup = finalists.find((group) => group.categoryId === category.id)
+          const startsStreamingSection =
+            category.id.startsWith("streaming-") && !ballotCategories[index - 1]?.id.startsWith("streaming-")
 
           if (!finalistGroup) {
             return null
           }
 
           return (
-            <fieldset key={category.id} className="border-b border-amber-100 p-5 sm:p-7">
-              <legend className="text-xl font-bold text-slate-950">{category.title}</legend>
-              {category.description ? <p className="mt-1 text-sm leading-6 text-slate-500">{category.description}</p> : null}
-              <div className="mt-5">
-                <RadioGroup
-                  value={ballot[category.id]}
-                  onValueChange={(value) => {
-                    setBallot((current) => ({ ...current, [category.id]: value }))
-                    setSubmitted(false)
-                    setError("")
-                    setDuplicateVotes([])
-                  }}
-                  className="space-y-2"
-                >
-                  {finalistGroup.nominees.map((nominee) => (
-                    <Label
-                      key={nominee.name}
-                      htmlFor={`${category.id}-${nominee.name}`}
-                      className="flex cursor-pointer items-start gap-3 rounded border border-slate-200 bg-white p-4 text-base transition hover:border-[#c90000] hover:bg-red-50"
-                    >
-                      <RadioGroupItem id={`${category.id}-${nominee.name}`} value={nominee.name} className="mt-1 border-slate-400 text-[#c90000]" />
-                      <div>
-                        <p className="font-semibold text-slate-950">{nominee.name}</p>
-                        {nominee.subtitle ? <p className="text-sm text-slate-500">{nominee.subtitle}</p> : null}
-                      </div>
-                    </Label>
-                  ))}
-                </RadioGroup>
-              </div>
-            </fieldset>
+            <div key={category.id}>
+              {startsStreamingSection ? (
+                <div className="border-y border-[#d3a247] bg-[linear-gradient(90deg,#fff7e8_0%,#ffffff_52%,#fff1d1_100%)] px-5 py-7 text-center sm:px-7">
+                  <p className="text-sm font-extrabold uppercase tracking-[0.32em] text-[#a06d12]">Streaming Category</p>
+                  <h3 className="mt-2 font-serif text-4xl leading-tight text-[#c90000] sm:text-5xl">Streaming</h3>
+                </div>
+              ) : null}
+              <fieldset className="border-b border-amber-100 p-5 sm:p-7">
+                <legend className="text-xl font-bold text-slate-950">{category.title}</legend>
+                {category.description ? <p className="mt-1 text-sm leading-6 text-slate-500">{category.description}</p> : null}
+                <div className="mt-5">
+                  <RadioGroup
+                    value={ballot[category.id]}
+                    onValueChange={(value) => {
+                      setBallot((current) => ({ ...current, [category.id]: value }))
+                      setSubmitted(false)
+                      setError("")
+                      setDuplicateVotes([])
+                    }}
+                    className="space-y-2"
+                  >
+                    {finalistGroup.nominees.map((nominee) => (
+                      <Label
+                        key={nominee.name}
+                        htmlFor={`${category.id}-${nominee.name}`}
+                        className="flex cursor-pointer items-start gap-3 rounded border border-slate-200 bg-white p-4 text-base transition hover:border-[#c90000] hover:bg-red-50"
+                      >
+                        <RadioGroupItem id={`${category.id}-${nominee.name}`} value={nominee.name} className="mt-1 border-slate-400 text-[#c90000]" />
+                        <div>
+                          <p className="font-semibold text-slate-950">{nominee.name}</p>
+                          {nominee.subtitle ? <p className="text-sm text-slate-500">{nominee.subtitle}</p> : null}
+                        </div>
+                      </Label>
+                    ))}
+                  </RadioGroup>
+                </div>
+              </fieldset>
+            </div>
           )
         })}
 
