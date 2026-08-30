@@ -51,6 +51,8 @@ export type PodscarsLiveData = {
   leaderboard: VoteLeaderboardEntry[]
 }
 
+export const VOTING_TRACKING_START_AT = "2026-08-30T18:00:00.000Z"
+
 function assertSupabaseConfigured() {
   if (!isSupabaseConfigured()) {
     throw new Error("Supabase is not configured.")
@@ -166,7 +168,7 @@ export async function getPodscarsLiveData(): Promise<PodscarsLiveData> {
     const supabase = getSupabaseAdminClient()
     const [{ data: nominationsData, error: nominationsError }, { data: votesData, error: votesError }] = await Promise.all([
       supabase.from("nominations").select("*").order("submitted_at", { ascending: false }),
-      supabase.from("votes").select("*").order("submitted_at", { ascending: false }),
+      supabase.from("votes").select("*").gte("submitted_at", VOTING_TRACKING_START_AT).order("submitted_at", { ascending: false }),
     ])
 
     if (nominationsError) {

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { getAdminSettings } from "@/lib/podscars-admin"
-import { getPodscarsLiveData } from "@/lib/podscars-live"
+import { getPodscarsLiveData, VOTING_TRACKING_START_AT } from "@/lib/podscars-live"
 import { createSupabaseServerClient } from "@/lib/supabase-server"
 import { getSupabaseAdminClient, isSupabaseConfigured } from "@/lib/supabase"
 
@@ -57,6 +57,7 @@ export async function POST(request: Request) {
       .select("category_id, category_title, nominee_name, award_year")
       .eq("voter_email", normalizedEmail)
       .eq("award_year", awardYear)
+      .gte("submitted_at", VOTING_TRACKING_START_AT)
       .in("category_id", categoryIds)
 
     if (existingError) {
