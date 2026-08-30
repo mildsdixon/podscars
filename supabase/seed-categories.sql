@@ -100,13 +100,22 @@ values
     10
   ),
   (
+    'best-controversial-podcast',
+    'Best Controversial Podcast',
+    'podcast',
+    'A podcast that sparked conversation, challenged opinions, and kept audiences talking.',
+    'Vote for the controversial podcast that made the biggest impact.',
+    true,
+    11
+  ),
+  (
     'best-lgbtq-podcast',
     'Best LGBTQ Podcast',
     'podcast',
     'A podcast centering LGBTQ voices, stories, culture, advocacy, or community.',
     'Nominate a standout LGBTQ podcast.',
     true,
-    11
+    12
   ),
   (
     'best-women-podcast',
@@ -115,7 +124,7 @@ values
     'A podcast centering women''s voices, stories, leadership, culture, or experiences.',
     'Nominate a standout women-focused podcast.',
     true,
-    12
+    13
   ),
   (
     'best-men-podcast',
@@ -124,7 +133,7 @@ values
     'A podcast centering men''s voices, stories, development, culture, or experiences.',
     'Nominate a standout men-focused podcast.',
     true,
-    13
+    14
   ),
   (
     'best-tech-podcast',
@@ -133,7 +142,7 @@ values
     'A podcast covering technology, innovation, digital culture, startups, AI, or future trends.',
     'Nominate a standout technology podcast.',
     true,
-    14
+    15
   ),
   (
     'best-food-and-drink-podcast',
@@ -142,7 +151,7 @@ values
     'A podcast exploring food, drink, restaurants, cooking, hospitality, or culinary culture.',
     'Nominate a standout food and drink podcast.',
     true,
-    15
+    16
   ),
   (
     'best-diversity-and-inclusion',
@@ -151,7 +160,7 @@ values
     'A podcast that advances representation, equity, inclusion, and underrepresented perspectives.',
     'Nominate a podcast with a strong diversity and inclusion impact.',
     true,
-    16
+    17
   ),
   (
     'best-political-podcast',
@@ -160,7 +169,7 @@ values
     'A political show with clear analysis, strong reporting, thoughtful debate, or civic insight.',
     'Nominate a standout political podcast.',
     true,
-    17
+    18
   ),
   (
     'best-business-podcast',
@@ -169,7 +178,7 @@ values
     'A podcast covering entrepreneurship, leadership, finance, careers, strategy, or business stories.',
     'Nominate a standout business podcast.',
     true,
-    18
+    19
   ),
   (
     'best-health-and-fitness-podcast',
@@ -178,7 +187,7 @@ values
     'A podcast covering wellness, fitness, mental health, nutrition, movement, or healthy living.',
     'Nominate a standout health and fitness podcast.',
     true,
-    19
+    20
   ),
   (
     'best-news-podcast',
@@ -187,7 +196,7 @@ values
     'A podcast delivering timely reporting, useful context, strong interviews, or clear news analysis.',
     'Nominate a standout news podcast.',
     true,
-    20
+    21
   ),
   (
     'best-spirituality-and-religion-podcast',
@@ -196,7 +205,7 @@ values
     'A podcast exploring faith, spirituality, religion, purpose, belief, or sacred practice.',
     'Nominate a standout spirituality or religion podcast.',
     true,
-    21
+    22
   ),
   (
     'best-travel-podcast',
@@ -205,7 +214,7 @@ values
     'A podcast that explores places, cultures, journeys, travel stories, or destination insight.',
     'Nominate a standout travel podcast.',
     true,
-    22
+    23
   ),
   (
     'best-duo-team-podcast',
@@ -214,7 +223,7 @@ values
     'A podcast powered by strong chemistry, collaboration, co-hosting, or ensemble energy.',
     'Nominate a standout duo or team podcast.',
     true,
-    23
+    24
   ),
   (
     'best-pop-culture-and-entertainment-podcast',
@@ -223,7 +232,7 @@ values
     'A podcast covering entertainment, celebrity, film, TV, music, internet culture, or cultural moments.',
     'Nominate a standout pop culture and entertainment podcast.',
     true,
-    24
+    25
   )
 on conflict (id) do update
 set

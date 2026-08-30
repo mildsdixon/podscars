@@ -109,6 +109,13 @@ export const defaultPodscarsCategories: PodscarsCategory[] = [
     nominationPrompt: "Nominate a podcast creating meaningful social impact.",
   },
   {
+    id: "best-controversial-podcast",
+    title: "Best Controversial Podcast",
+    type: "podcast",
+    description: "A podcast that sparked conversation, challenged opinions, and kept audiences talking.",
+    nominationPrompt: "Vote for the controversial podcast that made the biggest impact.",
+  },
+  {
     id: "best-lgbtq-podcast",
     title: "Best LGBTQ Podcast",
     type: "podcast",
@@ -501,6 +508,10 @@ export const defaultSampleFinalists: PodscarsFinalistGroup[] = [
       { name: "Detroit Table Talk", subtitle: "" },
       { name: "Podtalk", subtitle: "" },
     ],
+  },
+  {
+    categoryId: "best-controversial-podcast",
+    nominees: [{ name: "Dawg Face Podcast Unleashed", subtitle: "" }],
   },
   {
     categoryId: "best-women-podcast",
