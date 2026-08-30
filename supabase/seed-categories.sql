@@ -101,7 +101,7 @@ values
   ),
   (
     'best-controversial-podcast',
-    'Best Controversial Podcast',
+    'Best Controversial',
     'podcast',
     'A podcast that sparked conversation, challenged opinions, and kept audiences talking.',
     'Vote for the controversial podcast that made the biggest impact.',

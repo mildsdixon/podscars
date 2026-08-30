@@ -110,7 +110,7 @@ export const defaultPodscarsCategories: PodscarsCategory[] = [
   },
   {
     id: "best-controversial-podcast",
-    title: "Best Controversial Podcast",
+    title: "Best Controversial",
     type: "podcast",
     description: "A podcast that sparked conversation, challenged opinions, and kept audiences talking.",
     nominationPrompt: "Vote for the controversial podcast that made the biggest impact.",
@@ -511,7 +511,13 @@ export const defaultSampleFinalists: PodscarsFinalistGroup[] = [
   },
   {
     categoryId: "best-controversial-podcast",
-    nominees: [{ name: "Dawg Face Podcast Unleashed", subtitle: "" }],
+    nominees: [
+      { name: "Toxic Talk", subtitle: "" },
+      { name: "Talking Ish With My Boyz", subtitle: "" },
+      { name: "Girth", subtitle: "" },
+      { name: "We Listen and We Judge", subtitle: "" },
+      { name: "Dawgface TV Podcast Unleashed", subtitle: "" },
+    ],
   },
   {
     categoryId: "best-women-podcast",
