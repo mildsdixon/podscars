@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { ImageIcon, LoaderCircle, RefreshCw, Save, Settings2, ShieldCheck } from "lucide-react"
+import { ImageIcon, LoaderCircle, RefreshCw, Save, Settings2, ShieldCheck, Trophy } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -107,6 +107,19 @@ function formatRefreshTime(value: Date) {
   }).format(value)
 }
 
+function formatSubmittedTime(value: string | null) {
+  if (!value) {
+    return "No votes yet"
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value))
+}
+
 export function AdminDashboard({
   initialSettings,
   votes,
@@ -167,6 +180,117 @@ export function AdminDashboard({
     })
   }, [voteItems])
   const topCategoryLeaders = useMemo(() => voteLeaders.slice(0, 6), [voteLeaders])
+  const categoryRaceGroups = useMemo(() => {
+    const currentFinalists = parseFinalistText(finalistText, categoryItems)
+    const finalistByCategory = new Map(currentFinalists.map((group) => [group.categoryId, group.nominees]))
+    const categoryById = new Map(categoryItems.map((category) => [category.id, category]))
+    const voteBuckets = new Map<
+      string,
+      {
+        categoryTitle: string
+        nomineeVotes: Map<string, number>
+        totalVotes: number
+        voterEmails: Set<string>
+        latestVoteAt: string | null
+        recentVotes: LiveVote[]
+      }
+    >()
+
+    voteItems.forEach((vote) => {
+      const bucket =
+        voteBuckets.get(vote.categoryId) ||
+        {
+          categoryTitle: vote.categoryTitle,
+          nomineeVotes: new Map<string, number>(),
+          totalVotes: 0,
+          voterEmails: new Set<string>(),
+          latestVoteAt: null,
+          recentVotes: [],
+        }
+
+      bucket.totalVotes += 1
+      bucket.nomineeVotes.set(vote.nomineeName, (bucket.nomineeVotes.get(vote.nomineeName) || 0) + 1)
+
+      if (vote.voterEmail) {
+        bucket.voterEmails.add(vote.voterEmail.toLowerCase())
+      }
+
+      if (
+        vote.submittedAt &&
+        (!bucket.latestVoteAt || new Date(vote.submittedAt).getTime() > new Date(bucket.latestVoteAt).getTime())
+      ) {
+        bucket.latestVoteAt = vote.submittedAt
+      }
+
+      bucket.recentVotes.push(vote)
+      voteBuckets.set(vote.categoryId, bucket)
+    })
+
+    const categoryIds = [
+      ...categoryItems.map((category) => category.id),
+      ...Array.from(voteBuckets.keys()).filter((categoryId) => !categoryById.has(categoryId)),
+    ]
+
+    return categoryIds
+      .map((categoryId) => {
+        const category = categoryById.get(categoryId)
+        const voteBucket = voteBuckets.get(categoryId)
+        const nomineeNames = new Set((finalistByCategory.get(categoryId) || []).map((nominee) => nominee.name))
+
+        voteBucket?.nomineeVotes.forEach((_, nomineeName) => {
+          nomineeNames.add(nomineeName)
+        })
+
+        const totalVotes = voteBucket?.totalVotes || 0
+        const sortedNominees = Array.from(nomineeNames)
+          .map((name) => {
+            const votes = voteBucket?.nomineeVotes.get(name) || 0
+
+            return {
+              name,
+              votes,
+              share: totalVotes ? Math.round((votes / totalVotes) * 100) : 0,
+            }
+          })
+          .sort((left, right) => {
+            if (right.votes !== left.votes) {
+              return right.votes - left.votes
+            }
+
+            return left.name.localeCompare(right.name)
+          })
+
+        const leaderVotes = sortedNominees[0]?.votes || 0
+        const nominees = sortedNominees.map((nominee, index) => ({
+          ...nominee,
+          rank: index + 1,
+          status:
+            leaderVotes === 0
+              ? "No votes yet"
+              : nominee.votes === leaderVotes
+                ? "Leading"
+                : `${leaderVotes - nominee.votes} behind`,
+        }))
+
+        return {
+          categoryId,
+          categoryTitle: category?.title || voteBucket?.categoryTitle || categoryId,
+          totalVotes,
+          uniqueVoters: voteBucket?.voterEmails.size || 0,
+          latestVoteAt: voteBucket?.latestVoteAt || null,
+          nominees,
+          recentVotes: (voteBucket?.recentVotes || [])
+            .sort((left, right) => {
+              const leftTime = left.submittedAt ? new Date(left.submittedAt).getTime() : 0
+              const rightTime = right.submittedAt ? new Date(right.submittedAt).getTime() : 0
+
+              return rightTime - leftTime
+            })
+            .slice(0, 3),
+        }
+      })
+      .filter((group) => group.nominees.length)
+  }, [categoryItems, finalistText, voteItems])
 
   async function refreshVoteChart(silent = false) {
     if (!silent) {
@@ -522,6 +646,88 @@ export function AdminDashboard({
               </div>
             ))}
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-white">
+        <CardHeader>
+          <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-950 text-amber-300">
+            <Trophy className="h-6 w-6" />
+          </div>
+          <CardTitle className="text-3xl text-slate-950">Category race tracker</CardTitle>
+          <CardDescription className="text-base text-slate-600">
+            See who is leading and trailing inside each category as votes come in.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          {!categoryRaceGroups.length ? (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-slate-600">
+              Add ballot finalists to see nominee rankings by category.
+            </div>
+          ) : (
+            <div className="grid gap-5 xl:grid-cols-2">
+              {categoryRaceGroups.map((group) => (
+                <div key={group.categoryId} className="rounded-3xl border border-slate-200 p-5">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="text-lg font-bold text-slate-950">{group.categoryTitle}</p>
+                      <p className="mt-1 text-sm text-slate-500">Latest vote: {formatSubmittedTime(group.latestVoteAt)}</p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="rounded-full bg-slate-950 px-3 py-1 text-xs font-bold text-white">
+                        {group.totalVotes} votes
+                      </span>
+                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                        {group.uniqueVoters} voters
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 space-y-3">
+                    {group.nominees.map((nominee) => (
+                      <div key={`${group.categoryId}-${nominee.name}`} className="rounded-2xl border border-slate-100 bg-slate-50 p-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-slate-700 ring-1 ring-slate-200">
+                                #{nominee.rank}
+                              </span>
+                              <p className="break-words font-semibold text-slate-950">{nominee.name}</p>
+                            </div>
+                            <p className="mt-2 text-xs font-medium text-slate-500">{nominee.status}</p>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <p className="text-lg font-black text-slate-950">{nominee.votes}</p>
+                            <p className="text-xs text-slate-500">{nominee.share}%</p>
+                          </div>
+                        </div>
+                        <div className="mt-3 h-2 overflow-hidden rounded-full bg-white">
+                          <div
+                            className={`h-full rounded-full ${nominee.status === "Leading" ? "bg-amber-500" : "bg-[#c90000]"}`}
+                            style={{ width: `${nominee.share}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {group.recentVotes.length ? (
+                    <div className="mt-5 rounded-2xl bg-white p-3 ring-1 ring-slate-200">
+                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Recent picks</p>
+                      <div className="mt-3 space-y-2">
+                        {group.recentVotes.map((vote) => (
+                          <div key={vote.id} className="flex items-center justify-between gap-3 text-sm">
+                            <span className="min-w-0 truncate font-medium text-slate-700">{vote.nomineeName}</span>
+                            <span className="shrink-0 text-slate-400">{formatSubmittedTime(vote.submittedAt)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
