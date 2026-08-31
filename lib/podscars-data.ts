@@ -283,6 +283,13 @@ export const defaultPodscarsCategories: PodscarsCategory[] = [
     description: "A supporting actor whose performance elevated a streaming project.",
     nominationPrompt: "Select the streaming supporting actor who deserves recognition.",
   },
+  {
+    id: "streaming-best-director-of-photography",
+    title: "Streaming - Best Director of Photography",
+    type: "person",
+    description: "A director of photography whose visual work elevated a streaming project.",
+    nominationPrompt: "Select the streaming director of photography who deserves recognition.",
+  },
 ]
 
 export const streamingNominationCategories: PodscarsCategory[] = [
@@ -697,6 +704,16 @@ export const defaultSampleFinalists: PodscarsFinalistGroup[] = [
       { name: "Don Snipes", subtitle: "" },
       { name: "Marrion Hamm III", subtitle: "" },
       { name: "Robert Q Jackson", subtitle: "" },
+    ],
+  },
+  {
+    categoryId: "streaming-best-director-of-photography",
+    nominees: [
+      { name: "Tom Poloski", subtitle: "" },
+      { name: "Charles", subtitle: "" },
+      { name: "Julian D. Washington", subtitle: "" },
+      { name: "Rodney Sizemore", subtitle: "" },
+      { name: "Kellie Smith", subtitle: "" },
     ],
   },
 ]
