@@ -633,7 +633,7 @@ export const defaultSampleFinalists: PodscarsFinalistGroup[] = [
   {
     categoryId: "streaming-best-producer",
     nominees: [
-      { name: "Michle Moore", subtitle: "" },
+      { name: "Michel Moore", subtitle: "" },
       { name: "Rockey Black", subtitle: "" },
       { name: "Wil Lewis III", subtitle: "" },
       { name: "Darren Brown", subtitle: "" },
