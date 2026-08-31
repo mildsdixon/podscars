@@ -535,7 +535,7 @@ export const defaultSampleFinalists: PodscarsFinalistGroup[] = [
       { name: "Girth", subtitle: "" },
       { name: "Talks Wit Todd and The Hip Hop Nerds", subtitle: "" },
       { name: "Just My Thoughts", subtitle: "" },
-      { name: "Ty Mopkins", subtitle: "" },
+      { name: "Suite 1701 (Ty Mopkins)", subtitle: "" },
     ],
   },
   {
