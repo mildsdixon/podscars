@@ -606,7 +606,7 @@ export const defaultSampleFinalists: PodscarsFinalistGroup[] = [
       { name: "Dejuan Ford", subtitle: "" },
       { name: "Denzelle Dandridge", subtitle: "" },
       { name: "Ro-Spit", subtitle: "" },
-      { name: "Quiten Sharp", subtitle: "" },
+      { name: "Quentin Sharpe", subtitle: "" },
     ],
   },
   {
