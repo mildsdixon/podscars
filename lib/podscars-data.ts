@@ -435,6 +435,7 @@ export const defaultSampleFinalists: PodscarsFinalistGroup[] = [
       { name: "Good Game Productions", subtitle: "" },
       { name: "Shawn P. Entertainment", subtitle: "" },
       { name: "Detroit City Deals", subtitle: "" },
+      { name: "Rhea Conley (Fearless Focus LLC)", subtitle: "" },
     ],
   },
   {
