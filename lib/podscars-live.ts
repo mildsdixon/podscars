@@ -52,10 +52,34 @@ export type PodscarsLiveData = {
 }
 
 export const VOTING_TRACKING_START_AT = "2026-08-30T18:00:00.000Z"
+const SUPABASE_PAGE_SIZE = 1000
 
 function assertSupabaseConfigured() {
   if (!isSupabaseConfigured()) {
     throw new Error("Supabase is not configured.")
+  }
+}
+
+async function fetchAllRows<T>(queryPage: (from: number, to: number) => Promise<{ data: T[] | null; error: unknown }>) {
+  const rows: T[] = []
+  let from = 0
+
+  while (true) {
+    const to = from + SUPABASE_PAGE_SIZE - 1
+    const { data, error } = await queryPage(from, to)
+
+    if (error) {
+      throw error
+    }
+
+    const page = data || []
+    rows.push(...page)
+
+    if (page.length < SUPABASE_PAGE_SIZE) {
+      return rows
+    }
+
+    from += SUPABASE_PAGE_SIZE
   }
 }
 
@@ -166,21 +190,22 @@ export async function getPodscarsLiveData(): Promise<PodscarsLiveData> {
 
   try {
     const supabase = getSupabaseAdminClient()
-    const [{ data: nominationsData, error: nominationsError }, { data: votesData, error: votesError }] = await Promise.all([
-      supabase.from("nominations").select("*").order("submitted_at", { ascending: false }),
-      supabase.from("votes").select("*").gte("submitted_at", VOTING_TRACKING_START_AT).order("submitted_at", { ascending: false }),
+    const [nominationsData, votesData] = await Promise.all([
+      fetchAllRows<SupabaseNominationRow>((from, to) =>
+        supabase.from("nominations").select("*").order("submitted_at", { ascending: false }).range(from, to),
+      ),
+      fetchAllRows<SupabaseVoteRow>((from, to) =>
+        supabase
+          .from("votes")
+          .select("*")
+          .gte("submitted_at", VOTING_TRACKING_START_AT)
+          .order("submitted_at", { ascending: false })
+          .range(from, to),
+      ),
     ])
 
-    if (nominationsError) {
-      throw nominationsError
-    }
-
-    if (votesError) {
-      throw votesError
-    }
-
-    const nominations = mapSupabaseNominations((nominationsData || []) as SupabaseNominationRow[])
-    const votes = mapSupabaseVotes((votesData || []) as SupabaseVoteRow[])
+    const nominations = mapSupabaseNominations(nominationsData)
+    const votes = mapSupabaseVotes(votesData)
 
     return {
       source: "supabase",
