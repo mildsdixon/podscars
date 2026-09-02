@@ -710,7 +710,7 @@ export const defaultSampleFinalists: PodscarsFinalistGroup[] = [
   {
     categoryId: "streaming-best-director-of-photography",
     nominees: [
-      { name: "Tom Poloski", subtitle: "" },
+      { name: "Thomas Pawlowski", subtitle: "" },
       { name: "Charles", subtitle: "" },
       { name: "Julian D. Washington", subtitle: "" },
       { name: "Rodney Sizemore", subtitle: "" },
