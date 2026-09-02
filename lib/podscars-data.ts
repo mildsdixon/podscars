@@ -695,7 +695,7 @@ export const defaultSampleFinalists: PodscarsFinalistGroup[] = [
       { name: "Sabree Whitfield", subtitle: "" },
       { name: "Tia Blaque", subtitle: "" },
       { name: "Kia B", subtitle: "" },
-      { name: "Misha Bivons", subtitle: "" },
+      { name: "Mica Bivings", subtitle: "" },
     ],
   },
   {
