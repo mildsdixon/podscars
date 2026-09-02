@@ -703,7 +703,7 @@ export const defaultSampleFinalists: PodscarsFinalistGroup[] = [
     nominees: [
       { name: "Steve White", subtitle: "" },
       { name: "Don Snipes", subtitle: "" },
-      { name: "Marrion Hamm III", subtitle: "" },
+      { name: "Marion Hamm III", subtitle: "" },
       { name: "Robert Q Jackson", subtitle: "" },
     ],
   },
